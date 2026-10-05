@@ -62,6 +62,7 @@ html.pane .glyphs{color:transparent; text-shadow:none; animation:none!important}
 .readback{margin:0; color:var(--mist); font-size:15px; max-width:46ch}
 .readback strong{color:var(--chalk); font-weight:500}
 .note{margin:0; color:var(--mist); font-size:13px; max-width:52ch}
+.privacy{margin:6px 0 0; color:var(--mist); font-size:12px; opacity:.75}
 .alts{display:flex; flex-wrap:wrap; justify-content:center; gap:8px}
 .alts[hidden]{display:none}
 .alt{font:inherit; color:var(--chalk); background:rgba(244,244,244,.06); border:1px solid rgba(244,244,244,.24); border-radius:999px; padding:6px 14px; cursor:pointer; display:flex; gap:8px; align-items:baseline}
@@ -143,6 +144,7 @@ td .sub{display:block; color:var(--mist); font-size:12px}
       <input type="text" id="hint" placeholder="How it sounds, e.g. LEE-uh or rhymes with 'mia'" maxlength="80">
     </details>
     <p class="status" id="status" role="status"></p>
+    <p class="privacy">Names that aren't in the built-in list are spelled with help from Google.</p>
   </form>
 
   <details class="batch">
@@ -966,7 +968,9 @@ const NAME_LIST = (()=>{
   // family words
   'ammachi':'അമ്മച്ചി','ammoomma|ammumma':'അമ്മൂമ്മ','ammamma':'അമ്മമ്മ','appooppan|appuppan':'അപ്പൂപ്പൻ','achachan':'അച്ചാച്ചൻ','amma':'അമ്മ','achan|achhan':'അച്ഛൻ',
   'appa':'അപ്പ','chechi':'ചേച്ചി','chettan':'ചേട്ടൻ','ikka':'ഇക്ക','itha|itta':'ഇത്ത','umma':'ഉമ്മ','uppa':'ഉപ്പ','muthassi':'മുത്തശ്ശി','muthassan':'മുത്തശ്ശൻ',
-  'valiyammachi|valyammachi':'വല്യമ്മച്ചി','appachan':'അപ്പച്ചൻ','mazha':'മഴ'
+  'valiyammachi|valyammachi':'വല്യമ്മച്ചി','appachan':'അപ്പച്ചൻ','mazha':'മഴ',
+  // corrections people sent in
+  'lenin':'ലെനിൻ','hi|hii|hai':'ഹായ്','supraja':'സുപ്രജ','shubha|subha':'ശുഭ','dishant|dishanth':'ദിശാന്ത്'
   };
   const map={};
   for(const [k,v] of Object.entries(raw)) k.split('|').forEach(x=>map[x]=v);
@@ -1017,6 +1021,29 @@ const ML_RULES=(()=>{
   }
   return name => name.toLowerCase().split(/\s+/).map(x=>x.replace(/[^a-z]/g,'')).filter(Boolean).map(word).join(' ');
 })();
+
+/* Google's Malayalam transliteration (the service behind Google's Malayalam typing).
+   Unofficial, so it is only a helper: if it is slow, blocked or odd, the spelling rules take over.
+   Its answer is only ever used as text, never run as code. */
+async function googleName(name){
+  const ctrl=new AbortController(), timer=setTimeout(()=>ctrl.abort(),3000);
+  try{
+    const words=name.toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-z]/g,'')).filter(Boolean);
+    if(!words.length) return null;
+    const parts=await Promise.all(words.map(async w=>{
+      if(NAME_LIST[w]) return NAME_LIST[w];
+      const url='https://inputtools.google.com/request?itc=ml-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demo&text='+encodeURIComponent(w);
+      const res=await fetch(url,{signal:ctrl.signal});
+      const data=await res.json();
+      const best=data && data[0]==='SUCCESS' && data[1] && data[1][0] && data[1][0][1] && data[1][0][1][0];
+      if(typeof best!=='string') throw new Error('no answer');
+      return best;
+    }));
+    const ml=normalizeML(parts.join(' '));
+    return isCleanML(ml) ? ml : null;
+  }catch(e){ return null; }
+  finally{ clearTimeout(timer); }
+}
 
 function offlineName(name){
   const words=name.toLowerCase().trim().split(/\s+/);
@@ -1168,6 +1195,10 @@ $('ask').addEventListener('submit', async ev=>{
       if(e && ['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed','session_expired'].includes(e.code)) noClaude();
     }
   }
+  goBtn.disabled=true; setStatus('Writing it in Malayalam…');
+  const g=await googleName(name);
+  goBtn.disabled=false;
+  if(g){ render({malayalam:g, readback:'', note:"If it isn't quite right, type the name in Malayalam."}, key); setStatus(''); return; }
   if(!offline.ml || !isCleanML(offline.ml)){ setStatus('Type the name using English or Malayalam letters.', true); return; }
   render({malayalam:offline.ml, readback:'', note:"Best guess from the spelling. If it isn't right, type the name in Malayalam."}, key);
   setStatus('');
