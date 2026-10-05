@@ -770,6 +770,24 @@ const Pane=(()=>{
     s.fillStyle=gr; s.beginPath(); s.arc(c-R*.34,c-R*.4,R*.3,0,7); s.fill();
   })();
   const SPR=96/2/42;   // sprite half-size per unit of drop radius
+  // beads on the name: milkier water, a brighter rim and glint, so the letters read clearly
+  const SPB=document.createElement('canvas'); SPB.width=SPB.height=96;
+  (()=>{ const s=SPB.getContext('2d'), c=48, R=42;
+    let gr=s.createRadialGradient(c+2,c+5,R*.5,c+2,c+5,R+4); gr.addColorStop(0,'rgba(0,0,0,.3)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+    s.fillStyle=gr; s.beginPath(); s.arc(c+2,c+5,R+4,0,7); s.fill();
+    gr=s.createRadialGradient(c,c+R*.12,R*.05,c,c,R);
+    gr.addColorStop(0,'rgba(255,255,255,.4)'); gr.addColorStop(.6,'rgba(255,255,255,.5)'); gr.addColorStop(.88,'rgba(255,255,255,.95)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+    s.fillStyle=gr; s.beginPath(); s.arc(c,c,R,0,7); s.fill();
+    gr=s.createRadialGradient(c,c+R*.55,0,c,c+R*.55,R*.6); gr.addColorStop(0,'rgba(255,255,255,.9)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+    s.save(); s.beginPath(); s.arc(c,c,R*.86,0,7); s.clip(); s.fillStyle=gr; s.fillRect(0,0,96,96); s.restore();
+    gr=s.createRadialGradient(c-R*.34,c-R*.4,0,c-R*.34,c-R*.4,R*.32); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+    s.fillStyle=gr; s.beginPath(); s.arc(c-R*.34,c-R*.4,R*.32,0,7); s.fill();
+  })();
+  // frost: a faint white haze around each letter bead, like fogged glass, which fills the gaps between beads
+  const HZ=document.createElement('canvas'); HZ.width=HZ.height=64;
+  (()=>{ const s=HZ.getContext('2d'), gr=s.createRadialGradient(32,32,0,32,32,32);
+    gr.addColorStop(0,'rgba(255,255,255,.12)'); gr.addColorStop(.5,'rgba(255,255,255,.05)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+    s.fillStyle=gr; s.fillRect(0,0,64,64); })();
 
   let drops=[]; const MAXN=4000;
   const add=(x,y,r)=>{ if(drops.length<MAXN) drops.push({x,y,r,vx:0,vy:0,trail:0,seed:Math.random()*6.283,dead:false}); };
@@ -836,10 +854,12 @@ const Pane=(()=>{
 
   function paint(){
     g.clearRect(0,0,W,H);
-    for(const d of drops){
-      const r=d.r*SPR, st=Math.min(1.7,1+d.vy/(260*S+40)*.6);
-      g.drawImage(SP, d.x-r/st, d.y-r*st*.92, 2*r/st, 2*r*st);
-    }
+    const on=[], off=[];
+    for(const d of drops) (stickAt(d.x,d.y)>.45 && d.vy<20 ? on : off).push(d);
+    // haze first, so the beads sit on a soft white ground
+    for(const d of on){ const h=d.r*2.4+S*3; g.drawImage(HZ, d.x-h, d.y-h, 2*h, 2*h); }
+    for(const d of off){ const r=d.r*SPR, st=Math.min(1.7,1+d.vy/(260*S+40)*.6); g.drawImage(SP, d.x-r/st, d.y-r*st*.92, 2*r/st, 2*r*st); }
+    for(const d of on){ const r=d.r*SPR; g.drawImage(SPB, d.x-r, d.y-r*.92, 2*r, 2*r); }
   }
 
   // 5. wiping the glass
