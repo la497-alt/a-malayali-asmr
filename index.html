@@ -154,7 +154,7 @@ td .sub{display:block; color:var(--mist); font-size:12px}
     </div>
     <details>
       <summary>Said differently from how it's spelled?</summary>
-      <input type="text" id="hint" placeholder="How it sounds, e.g. LEE-uh or rhymes with 'mia'" maxlength="80">
+      <input type="text" id="hint" placeholder="How it sounds, e.g. lee-a or dhi-shaanth" maxlength="80">
     </details>
     <p class="status" id="status" role="status"></p>
     <p class="privacy">Names that aren't in the built-in list are spelled with help from Google.</p>
@@ -1048,13 +1048,13 @@ function googleScript(url){
     tag.src=url+'&cb='+cb; document.head.append(tag);
   });
 }
-async function googleName(name){
+async function googleName(name, useList=true){
   const ctrl=new AbortController(), timer=setTimeout(()=>ctrl.abort(),2500);
   try{
     const words=name.toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-z]/g,'')).filter(Boolean);
     if(!words.length) return null;
     const parts=await Promise.all(words.map(async w=>{
-      if(NAME_LIST[w]) return NAME_LIST[w];
+      if(useList && NAME_LIST[w]) return NAME_LIST[w];
       const url='https://inputtools.google.com/request?itc=ml-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=jsapi&text='+encodeURIComponent(w);
       let data;
       try{ data=await (await fetch(url,{signal:ctrl.signal})).json(); }
@@ -1067,6 +1067,14 @@ async function googleName(name){
     return isCleanML(ml) ? ml : null;
   }catch(e){ return null; }
   finally{ clearTimeout(timer); }
+}
+
+/* "How it sounds" spelled out (lee-a, LEE-uh, dhi-shaanth) → letters to spell from */
+function soundSpelling(hint){
+  let h=hint.toLowerCase().replace(/["'“”‘’]/g,'').trim();
+  if(!h || /rhymes|sounds like|\blike\b/.test(h)) return '';
+  h=h.replace(/uh(?=-|\s|$)/g,'a').replace(/[-.]/g,'').replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim();
+  return h;
 }
 
 function offlineName(name){
@@ -1218,6 +1226,16 @@ $('ask').addEventListener('submit', async ev=>{
       if(e && e.code==='cancelled') return;
       if(e && ['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed','session_expired'].includes(e.code)) noClaude();
     }
+  }
+  // the way it's said wins over the way it's spelled
+  if(hint && ML.test(hint)){ render({malayalam:normalizeML(hint), readback:'', note:'Shown as you typed it.'}, key); setStatus(''); return; }
+  const said=hint ? soundSpelling(hint) : '';
+  if(said){
+    goBtn.disabled=true; setStatus('Writing it in Malayalam…');
+    const gs=await googleName(said,false);
+    goBtn.disabled=false;
+    const ml=gs || normalizeML(ML_RULES(said));
+    if(ml && isCleanML(ml)){ render({malayalam:ml, readback:'', note:gs ? "Spelled from how it's said, with Google's help." : "Best guess from how it's said."}, key); setStatus(''); return; }
   }
   goBtn.disabled=true; setStatus('Writing it in Malayalam…');
   const g=await googleName(name);
