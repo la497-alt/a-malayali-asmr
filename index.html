@@ -36,11 +36,19 @@ html.gl-ready .bg{display:none}
 main{max-width:760px; width:100%; margin:0 auto; padding:18px 14px 28px; min-height:100vh; min-height:100dvh; display:flex}
 .card{flex:1; min-width:0; display:flex; flex-direction:column; background:rgba(0,0,0,.54); border:1px solid rgba(244,244,244,.1); border-radius:22px; padding:16px 20px 26px; position:relative; z-index:1}
 
-.sound{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:14px; color:var(--mist)}
+.sound{display:flex; align-items:center; justify-content:center; gap:12px 26px; flex-wrap:wrap; font-size:14px; color:var(--mist); position:relative; z-index:3}
+/* sound and music: white round buttons with dark gray icons, white words beside them */
+.toggle{display:flex; align-items:center; gap:10px; background:none; border:0; padding:4px; color:#fff; font:inherit; font-size:15px; cursor:pointer}
+.toggle .ico{width:46px; height:46px; flex:none; border-radius:50%; background:#fff; display:grid; place-items:center; box-shadow:0 2px 12px rgba(0,0,0,.4); transition:transform .15s ease}
+.toggle svg{width:24px; height:24px; fill:none; stroke:#3a3a3a; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.toggle[aria-pressed="true"] .slash{display:none}
+.toggle[aria-pressed="true"] .ico{box-shadow:0 0 0 3px rgba(255,255,255,.35), 0 2px 12px rgba(0,0,0,.4)}
+.toggle:hover .ico{transform:scale(1.06)}
+.toggle:focus-visible{outline:2px solid #fff; outline-offset:4px; border-radius:999px}
 .pill{font:inherit; color:var(--chalk); background:rgba(244,244,244,.08); border:1px solid rgba(244,244,244,.26); border-radius:999px; padding:6px 14px; cursor:pointer}
 .pill[aria-pressed="true"]{background:var(--chalk); color:#0c0c0c; border-color:var(--chalk)}
 .pill:hover{background:rgba(244,244,244,.16)} .pill[aria-pressed="true"]:hover{background:#fff}
-.level{margin-left:auto}
+.level{width:100%; text-align:center; font-size:13px}
 .ctl{display:flex; align-items:center; gap:8px}
 .ctl input[type=range]{width:96px; accent-color:var(--chalk)}
 .ctl input[hidden]{display:none}
@@ -114,23 +122,28 @@ td .sub{display:block; color:var(--mist); font-size:12px}
 </svg>
 <main>
  <div class="card">
-  <div class="sound">
-    <div class="ctl">
-      <button class="pill" id="snd" type="button" aria-pressed="false">Turn rain sound on</button>
-      <input id="volRain" type="range" min="0" max="100" value="80" aria-label="Rain volume" hidden>
-    </div>
-    <div class="ctl">
-      <button class="pill" id="mus" type="button" aria-pressed="false">Turn music on</button>
-      <input id="volMusic" type="range" min="0" max="100" value="80" aria-label="Music volume" hidden>
-    </div>
-    <span class="level" id="level" aria-live="polite"></span>
-  </div>
-
   <section class="stage" aria-live="polite">
     <div class="word" id="word"></div>
     <p class="readback" id="readback"></p>
     <p class="note" id="note"></p>
     <div class="alts" id="alts" hidden></div>
+  <div class="sound">
+    <div class="ctl">
+      <button class="toggle" id="snd" type="button" aria-pressed="false">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 0 1-.4-8A5 5 0 0 1 16.4 6 4.5 4.5 0 0 1 17 15z"/><path d="M8 18l-1 2.5M12 18l-1 2.5M16 18l-1 2.5"/><path class="slash" d="M3 3l18 18"/></svg></span>
+        <span class="lbl">Turn rain sound on</span>
+      </button>
+      <input id="volRain" type="range" min="0" max="100" value="80" aria-label="Rain volume" hidden>
+    </div>
+    <div class="ctl">
+      <button class="toggle" id="mus" type="button" aria-pressed="false">
+        <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/><path class="slash" d="M3 3l18 18"/></svg></span>
+        <span class="lbl">Turn music on</span>
+      </button>
+      <input id="volMusic" type="range" min="0" max="100" value="80" aria-label="Music volume" hidden>
+    </div>
+    <span class="level" id="level" aria-live="polite"></span>
+  </div>
   </section>
 
   <form class="ask" id="ask" autocomplete="off">
@@ -518,7 +531,7 @@ function wire(btn, mod, onLabel, offLabel){
     try{
       const now=await mod.toggle(!mod.on);
       btn.setAttribute('aria-pressed', String(now));
-      btn.textContent = now ? offLabel : onLabel;
+      btn.querySelector('.lbl').textContent = now ? offLabel : onLabel;
       if(now && Engine.isIOS) setStatus("No sound? Turn up the volume and check the side switch isn't on silent.");
       syncSound();
     }catch{ setStatus("Sound couldn't start in this browser. Tap the button again, or try another browser.", true); }
