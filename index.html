@@ -22,9 +22,9 @@ body{margin:0; min-height:100%; background:transparent; color:var(--chalk); font
 /* photo background: three layers, each fades in and out over about a minute, one full cycle = 10 min */
 .bg{position:fixed; inset:0; z-index:-4; background:#000; overflow:hidden; filter:grayscale(1) contrast(1.08)}
 .bg i{position:absolute; inset:0; background-size:cover; background-repeat:no-repeat; opacity:0; animation:bgcycle 600s linear infinite}
-.bg i:nth-child(1){background-image:url(images/river-log.jpg); background-position:50% 68%; animation-delay:-120s}
-.bg i:nth-child(2){background-image:url(images/river-hills.jpg); background-position:50% 60%; animation-delay:-520s}
-.bg i:nth-child(3){background-image:url(images/river-field.jpg); background-position:50% 62%; animation-delay:-320s}
+.bg i:nth-child(1){background-image:url(river-log.jpg); background-position:50% 68%; animation-delay:-120s}
+.bg i:nth-child(2){background-image:url(river-hills.jpg); background-position:50% 60%; animation-delay:-520s}
+.bg i:nth-child(3){background-image:url(river-field.jpg); background-position:50% 62%; animation-delay:-320s}
 @keyframes bgcycle{0%{opacity:0}10%{opacity:1}40%{opacity:1}50%{opacity:0}100%{opacity:0}}
 @media (prefers-reduced-motion: reduce){ .bg i{animation:none} .bg i:nth-child(1){opacity:1} }
 
