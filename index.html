@@ -1,0 +1,1179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A malayali ASMR</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Malayalam:wght@400;500;600&family=Baloo+Chettan+2:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --mist:#C9C9C9; --chalk:#F4F4F4;
+  --ui:"Anek Malayalam", "Noto Sans Malayalam", system-ui, sans-serif;
+  --letter:"Baloo Chettan 2", "Manjari", "Noto Sans Malayalam", sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%; scroll-padding-top:env(safe-area-inset-top,0px); background:#000}
+body{margin:0; min-height:100%; background:transparent; color:var(--chalk); font-family:var(--ui); font-size:16px; line-height:1.5}
+
+/* photo background: three layers, each fades in and out over about a minute, one full cycle = 10 min */
+.bg{position:fixed; inset:0; z-index:-4; background:#000; overflow:hidden; filter:grayscale(1) contrast(1.08)}
+.bg i{position:absolute; inset:0; background-size:cover; background-repeat:no-repeat; opacity:0; animation:bgcycle 600s linear infinite}
+.bg i:nth-child(1){background-image:url(images/river-log.jpg); background-position:50% 68%; animation-delay:-120s}
+.bg i:nth-child(2){background-image:url(images/river-hills.jpg); background-position:50% 60%; animation-delay:-520s}
+.bg i:nth-child(3){background-image:url(images/river-field.jpg); background-position:50% 62%; animation-delay:-320s}
+@keyframes bgcycle{0%{opacity:0}10%{opacity:1}40%{opacity:1}50%{opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){ .bg i{animation:none} .bg i:nth-child(1){opacity:1} }
+
+#water{position:fixed; inset:0; width:100%; height:100%; z-index:-3; display:block; opacity:0; transition:opacity 1.2s ease}
+html.gl #water{opacity:1}
+html.gl-ready .bg{display:none}
+#rain{position:fixed; inset:0; width:100%; height:100%; z-index:-2; pointer-events:none}
+
+main{max-width:760px; width:100%; margin:0 auto; padding:18px 14px 28px; min-height:100vh; min-height:100dvh; display:flex}
+.card{flex:1; min-width:0; display:flex; flex-direction:column; background:rgba(0,0,0,.54); border:1px solid rgba(244,244,244,.1); border-radius:22px; padding:16px 20px 26px; position:relative; z-index:1}
+
+.sound{display:flex; align-items:center; gap:10px; flex-wrap:wrap; font-size:14px; color:var(--mist)}
+.pill{font:inherit; color:var(--chalk); background:rgba(244,244,244,.08); border:1px solid rgba(244,244,244,.26); border-radius:999px; padding:6px 14px; cursor:pointer}
+.pill[aria-pressed="true"]{background:var(--chalk); color:#0c0c0c; border-color:var(--chalk)}
+.pill:hover{background:rgba(244,244,244,.16)} .pill[aria-pressed="true"]:hover{background:#fff}
+.level{margin-left:auto}
+.ctl{display:flex; align-items:center; gap:8px}
+.ctl input[type=range]{width:96px; accent-color:var(--chalk)}
+.ctl input[hidden]{display:none}
+
+.stage{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:46vh; text-align:center; gap:18px; padding:14px 0}
+.word{display:grid; width:100%; filter:url(#chalk); min-height:1.2em}
+.glyphs{grid-area:1/1; place-self:center; font-family:var(--letter); font-weight:800; line-height:1.05; color:var(--chalk); white-space:nowrap; text-shadow:0 0 18px rgba(255,255,255,.08)}
+.glyphs .line{display:block}
+.entering{animation:settle 1.1s .3s both cubic-bezier(.2,.7,.2,1)}
+.leaving{animation:wash .9s both cubic-bezier(.5,0,.8,.4)}
+@keyframes settle{from{opacity:0; transform:translateY(-16px); filter:blur(10px)} to{opacity:1; transform:none; filter:blur(0)}}
+@keyframes wash{to{opacity:0; transform:translateY(22px) scaleY(1.04); filter:blur(7px)}}
+@media (prefers-reduced-motion: reduce){ .entering{animation:fade .4s both} .leaving{animation:fade .3s reverse both} @keyframes fade{from{opacity:0}to{opacity:1}} }
+/* the glass: when it runs, the letters are drawn only by water on the pane */
+.stage{position:relative}
+#pane{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2}
+html.pane .word{filter:none; touch-action:none; user-select:none; -webkit-user-select:none; cursor:grab}
+html.pane .glyphs{color:transparent; text-shadow:none; animation:none!important}
+.readback{margin:0; color:var(--mist); font-size:15px; max-width:46ch}
+.readback strong{color:var(--chalk); font-weight:500}
+.note{margin:0; color:var(--mist); font-size:13px; max-width:52ch}
+.alts{display:flex; flex-wrap:wrap; justify-content:center; gap:8px}
+.alts[hidden]{display:none}
+.alt{font:inherit; color:var(--chalk); background:rgba(244,244,244,.06); border:1px solid rgba(244,244,244,.24); border-radius:999px; padding:6px 14px; cursor:pointer; display:flex; gap:8px; align-items:baseline}
+.alt .ml{font-family:var(--letter); font-weight:700; font-size:20px}
+.alt .why{font-size:12px; color:var(--mist)}
+.alt:hover{background:rgba(244,244,244,.12)}
+.ask{margin-top:20px}
+label{display:block; font-size:14px; color:var(--mist); margin-bottom:8px}
+label span[lang]{color:var(--chalk); margin-left:6px}
+.row{display:flex; gap:8px}
+input[type=text],textarea,select{font:inherit; color:var(--chalk); background:rgba(0,0,0,.45); border:1px solid rgba(244,244,244,.3); border-radius:12px; padding:12px 14px; min-width:0}
+#name{flex:1; font-size:18px}
+input::placeholder,textarea::placeholder{color:rgba(201,201,201,.6)}
+button.go{font:inherit; font-weight:600; color:#0c0c0c; background:var(--chalk); border:0; border-radius:12px; padding:0 18px; cursor:pointer; white-space:nowrap}
+button.go:disabled{opacity:.55; cursor:progress}
+:focus-visible{outline:2px solid var(--chalk); outline-offset:3px}
+details{margin-top:12px; font-size:14px; color:var(--mist)}
+summary{cursor:pointer; padding:4px 0}
+details input[type=text]{width:100%; margin-top:8px; font-size:16px}
+.status{min-height:1.5em; margin:12px 0 0; font-size:14px; color:var(--mist)}
+.status.err{color:#FFFFFF; font-weight:500}
+.batch[hidden]{display:none}
+.batch{margin-top:24px; border-top:1px solid rgba(244,244,244,.16); padding-top:14px}
+.batch textarea{width:100%; min-height:84px; margin-top:8px; resize:vertical}
+.batch .controls{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap}
+.batch .controls button{padding:10px 18px}
+.table-wrap{overflow-x:auto; margin-top:14px}
+table{border-collapse:collapse; width:100%; font-size:14px; color:var(--chalk)}
+th,td{text-align:left; padding:8px 10px 8px 0; border-bottom:1px solid rgba(244,244,244,.14); vertical-align:top}
+th{color:var(--mist); font-weight:500}
+td.ml{font-family:var(--letter); font-weight:700; font-size:20px; white-space:nowrap}
+tr.pick{cursor:pointer} tr.pick:hover td{background:rgba(244,244,244,.06)}
+td .sub{display:block; color:var(--mist); font-size:12px}
+.low{color:#FFFFFF; font-weight:600}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+<canvas id="water" aria-hidden="true"></canvas>
+<canvas id="rain" aria-hidden="true"></canvas>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="chalk" x="-5%" y="-10%" width="110%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9 0.22" numOctaves="2" seed="7" result="grain"/>
+    <feColorMatrix in="grain" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  -2.6 0 0 0 1.9" result="mask"/>
+    <feComposite in="SourceGraphic" in2="mask" operator="in" result="dry"/>
+    <feTurbulence type="turbulence" baseFrequency="0.025" numOctaves="2" seed="3" result="warp"/>
+    <feDisplacementMap in="dry" in2="warp" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+</svg>
+<main>
+ <div class="card">
+  <div class="sound">
+    <div class="ctl">
+      <button class="pill" id="snd" type="button" aria-pressed="false">Turn rain sound on</button>
+      <input id="volRain" type="range" min="0" max="100" value="80" aria-label="Rain volume" hidden>
+    </div>
+    <div class="ctl">
+      <button class="pill" id="mus" type="button" aria-pressed="false">Turn music on</button>
+      <input id="volMusic" type="range" min="0" max="100" value="80" aria-label="Music volume" hidden>
+    </div>
+    <span class="level" id="level" aria-live="polite"></span>
+  </div>
+
+  <section class="stage" aria-live="polite">
+    <div class="word" id="word"></div>
+    <p class="readback" id="readback"></p>
+    <p class="note" id="note"></p>
+    <div class="alts" id="alts" hidden></div>
+  </section>
+
+  <form class="ask" id="ask" autocomplete="off">
+    <label for="name">Your name <span lang="ml">നിങ്ങളുടെ പേര്</span></label>
+    <div class="row">
+      <input type="text" id="name" name="name" placeholder="Type a name" maxlength="60" required>
+      <button class="go" id="go" type="submit">Write it</button>
+    </div>
+    <details>
+      <summary>Said differently from how it's spelled?</summary>
+      <input type="text" id="hint" placeholder="How it sounds, e.g. LEE-uh or rhymes with 'mia'" maxlength="80">
+    </details>
+    <p class="status" id="status" role="status"></p>
+  </form>
+
+  <details class="batch">
+    <summary>Check a list of names for accuracy</summary>
+    <textarea id="list" aria-label="Names, separated by commas or new lines">Leah, Lakshmi, Arjun, Fathima, Sebastian, Peter, Zoe, Muhammad, Siobhan, Xiaoming, Nguyen, Aaliyah</textarea>
+    <div class="controls">
+      <select id="tier" aria-label="Model">
+        <option value="default">Careful (slower)</option>
+        <option value="quick">Fast</option>
+      </select>
+      <button class="go" id="checkAll" type="button">Check all</button>
+    </div>
+    <div class="table-wrap"><table id="results" hidden>
+      <thead><tr><th>Name</th><th>Malayalam</th><th>Reads as</th><th>Confidence</th></tr></thead>
+      <tbody></tbody>
+    </table></div>
+  </details>
+ </div>
+</main>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const wordEl=$('word'), readEl=$('readback'), noteEl=$('note'), altsEl=$('alts'), statusEl=$('status'), goBtn=$('go');
+const ML = /[\u0D00-\u0D7F]/;
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch{ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} }
+};
+const CHOSEN_KEY = 'malayalam-names-chosen-v1';
+let chosen = store.get(CHOSEN_KEY) || {};
+let samplePromise = (window.claude && window.claude.use) ? window.claude.use('sample').catch(()=>null) : Promise.resolve(null);
+let claudeGone=false;
+const quickSample = () => claudeGone ? Promise.resolve(null) : Promise.race([samplePromise, new Promise(r=>setTimeout(()=>r(null),2000))]);
+function noClaude(){ claudeGone=true; const b=document.querySelector('.batch'); if(b) b.hidden=true; }
+samplePromise.then(s=>{ if(!s) noClaude(); });
+
+/* ============ rain intensity from the Malayalam name ============ */
+/* Longer names, more conjuncts (്+consonant) and harder consonants make heavier rain. */
+const HARD = 'ഖഘഛഝഠഢഥധഫഭഷടഡ';
+function intensityOf(ml){
+  let score=0;
+  const cps=[...String(ml||'')];
+  for(let i=0;i<cps.length;i++){
+    const c=cps[i], n=c.codePointAt(0);
+    const consonant = n>=0x0D15 && n<=0x0D3A;
+    const vowel = n>=0x0D05 && n<=0x0D14;
+    const chillu = n>=0x0D7A && n<=0x0D7F;
+    if(consonant||vowel||chillu) score+=1;
+    if(HARD.includes(c)) score+=.5;
+    if(c==='\u0D4D' && cps[i+1] && cps[i+1].codePointAt(0)>=0x0D15 && cps[i+1].codePointAt(0)<=0x0D3A) score+=1.5;
+  }
+  return Math.max(.16, Math.min(1, .16 + .84*Math.min(1, score/14)));
+}
+const LEVELS=[[.3,'Drizzle'],[.5,'Light rain'],[.7,'Steady rain'],[.88,'Heavy rain'],[2,'Downpour']];
+const levelName = i => LEVELS.find(l=>i<l[0])[1];
+
+/* ============ shared audio output ============ */
+const Engine=(()=>{
+  let ctx=null, bus=null, el=null; const users=new Set();
+  const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  function ensure(){
+    if(ctx){ if(el) el.play().catch(()=>{}); return; }
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC) throw new Error('no audio');
+    ctx=new AC();
+    bus=ctx.createDynamicsCompressor(); bus.threshold.value=-20; bus.ratio.value=3.5; bus.attack.value=.01; bus.release.value=.3;
+    const trim=ctx.createGain(); trim.gain.value=.72;
+    const lim=ctx.createDynamicsCompressor(); lim.threshold.value=-4; lim.knee.value=0; lim.ratio.value=20; lim.attack.value=.002; lim.release.value=.12;
+    bus.connect(trim); trim.connect(lim);
+    // iPhone silences Web Audio when the side switch is on silent; play through a media element instead
+    try{ if(navigator.audioSession) navigator.audioSession.type='playback'; }catch{}
+    if(isIOS && ctx.createMediaStreamDestination){
+      const dest=ctx.createMediaStreamDestination(); lim.connect(dest);
+      el=new Audio(); el.setAttribute('playsinline',''); el.srcObject=dest.stream;
+      el.play().catch(()=>{ lim.disconnect(); lim.connect(ctx.destination); el=null; });
+    } else lim.connect(ctx.destination);
+  }
+  return {
+    isIOS,
+    async start(who){ ensure(); users.add(who); await ctx.resume(); if(ctx.state!=='running'){ users.delete(who); throw new Error('blocked'); } },
+    stop(who){ users.delete(who); setTimeout(()=>{ if(!users.size&&ctx) ctx.suspend(); },1800); },
+    get ctx(){ return ctx; }, get bus(){ return bus; },
+    pause(){ if(ctx&&users.size) ctx.suspend(); },
+    resume(){ if(ctx&&users.size) ctx.resume(); }
+  };
+})();
+
+/* ============ rain audio (synthesized, no files) ============ */
+const Rain=(()=>{
+  let ctx=null, built=false, master, bedG, bedF, hissG, bodyG, dropBus, white, pink, brown;
+  let on=false, I=.28, vol=.8, nextDrop=0;
+  function noise(kind, sec){
+    const sr=ctx.sampleRate, n=Math.floor(sr*sec), f=Math.floor(sr*.4), buf=ctx.createBuffer(2,n,sr);
+    for(let c=0;c<2;c++){
+      const t=new Float32Array(n+f); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0,last=0;
+      for(let i=0;i<n+f;i++){
+        const w=Math.random()*2-1;
+        if(kind==='white') t[i]=w;
+        else if(kind==='pink'){ b0=.99886*b0+w*.0555179; b1=.99332*b1+w*.0750759; b2=.969*b2+w*.153852; b3=.8665*b3+w*.3104856; b4=.55*b4+w*.5329522; b5=-.7616*b5-w*.016898; t[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11; b6=w*.115926; }
+        else { last=(last+.02*w)/1.02; t[i]=last*3.5; }
+      }
+      for(let i=0;i<f;i++){ const k=i/f; t[i]=t[i]*Math.sin(k*Math.PI/2)+t[n+i]*Math.cos(k*Math.PI/2); } // seamless loop
+      buf.getChannelData(c).set(t.subarray(0,n));
+    }
+    return buf;
+  }
+  function loop(buf){ const s=ctx.createBufferSource(); s.buffer=buf; s.loop=true; s.start(0, Math.random()*buf.duration); return s; }
+  function biquad(type,freq,q){ const f=ctx.createBiquadFilter(); f.type=type; f.frequency.value=freq; if(q!=null) f.Q.value=q; return f; }
+  function build(){
+    ctx=Engine.ctx;
+    white=noise('white',3); pink=noise('pink',7); brown=noise('brown',9);
+    master=ctx.createGain(); master.gain.value=0; master.connect(Engine.bus);
+    bedF=biquad('bandpass',1300,.45); bedG=ctx.createGain(); bedG.gain.value=0;
+    loop(pink).connect(bedF); bedF.connect(bedG); bedG.connect(master);
+    hissG=ctx.createGain(); hissG.gain.value=0;
+    const hp=biquad('highpass',5200,.7), lp=biquad('lowpass',12000,.7);
+    loop(white).connect(hp); hp.connect(lp); lp.connect(hissG); hissG.connect(master);
+    bodyG=ctx.createGain(); bodyG.gain.value=0;
+    const bl=biquad('lowpass',380,.7); loop(brown).connect(bl); bl.connect(bodyG); bodyG.connect(master);
+    dropBus=ctx.createGain(); dropBus.gain.value=1; dropBus.connect(master);
+    built=true; setInterval(tick,40);
+  }
+  function pan(v){ if(ctx.createStereoPanner){ const p=ctx.createStereoPanner(); p.pan.value=v; return p; } return ctx.createGain(); }
+  function drop(t){
+    if(Math.random()<.8){
+      const s=ctx.createBufferSource(); s.buffer=white;
+      const dur=.006+Math.random()*.02, f=biquad('bandpass',1800+Math.random()*5500,3+Math.random()*5);
+      const g=ctx.createGain(), lvl=(.15+Math.random()*.5)*(.5+I), p=pan(Math.random()*1.6-.8);
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(lvl,t+.0015); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+      s.connect(f); f.connect(g); g.connect(p); p.connect(dropBus);
+      s.start(t, Math.random()*2, dur+.02);
+    }else{
+      const o=ctx.createOscillator(), g=ctx.createGain(), p=pan(Math.random()*1.4-.7), f0=650+Math.random()*900;
+      o.frequency.setValueAtTime(f0,t); o.frequency.exponentialRampToValueAtTime(f0*.5,t+.07);
+      const lvl=.04+Math.random()*.06;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(lvl,t+.004); g.gain.exponentialRampToValueAtTime(.0001,t+.09);
+      o.connect(g); g.connect(p); p.connect(dropBus); o.start(t); o.stop(t+.1);
+    }
+  }
+  function tick(){
+    if(!on||ctx.state!=='running') return;
+    const now=ctx.currentTime; if(nextDrop<now) nextDrop=now+.02;
+    const rate=4+66*Math.pow(I,1.25);
+    while(nextDrop<now+.12){ drop(nextDrop); nextDrop+=-Math.log(1-Math.random())/rate; }
+  }
+  function roll(){
+    if(!on||ctx.state!=='running') return;
+    const t=ctx.currentTime+.4, s=ctx.createBufferSource(); s.buffer=brown;
+    const lp=biquad('lowpass',140,.7), g=ctx.createGain();
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.9,t+1.6); g.gain.exponentialRampToValueAtTime(.0001,t+6.5);
+    s.connect(lp); lp.connect(g); g.connect(master); s.start(t, Math.random()*4, 7);
+  }
+  function apply(){
+    if(!built) return; const t=ctx.currentTime, tc=1.3;
+    bedG.gain.setTargetAtTime(.8+2.4*I, t, tc);
+    bedF.frequency.setTargetAtTime(900+1500*I, t, tc);
+    hissG.gain.setTargetAtTime(.01+.30*Math.pow(I,1.4), t, tc);
+    bodyG.gain.setTargetAtTime(.02+.30*I*I, t, tc);
+    master.gain.setTargetAtTime(on? vol*(.75+.75*I) : 0, t, on?.9:.4);
+  }
+  return {
+    async toggle(v){
+      if(v){ await Engine.start('rain'); if(!built) build(); on=true; nextDrop=0; apply(); }
+      else { on=false; apply(); Engine.stop('rain'); }
+      return on;
+    },
+    setIntensity(v){ const prev=I; I=v; apply(); if(on && prev<.8 && v>=.8 && Math.random()<.6) setTimeout(roll,900); },
+    setVolume(v){ vol=v; apply(); },
+    get on(){ return on; }
+  };
+})();
+
+/* ============ music: gentle piano, a different tune for each name ============ */
+/* Public-domain melodies, arranged for one warm piano. Syllables in the name set how full and lively it plays. */
+function CH(name){
+  const m=name.match(/^([A-G])([#b]?)(.*)$/), PC={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+  const pc=(PC[m[1]]+(m[2]==='#'?1:m[2]==='b'?-1:0)+12)%12, q=m[3];
+  const iv = q==='m'?[0,3,7] : q==='7'?[0,4,7,10] : q==='maj7'?[0,4,7,11] : q==='m7'?[0,3,7,10] : [0,4,7];
+  return {bass:36+pc, tones:iv.map(i=>48+pc+i)};
+}
+const TUNES=(()=>{
+  const seq=list=>list;
+  const W=[64,65,67,69,71,72,74,76,77,79,81];
+  const runs=[]; [3,2,1].forEach(r=>{ for(let i=0;i<8;i++) runs.push([W[r+i],.25]); for(let i=0;i<8;i++) runs.push([W[r+6-i],.25]); });
+  for(let i=0;i<8;i++) runs.push([W[i],.25]); runs.push([72,2]);
+  const tw1=[[72,1],[72,1],[79,1],[79,1],[81,1],[81,1],[79,2],[77,1],[77,1],[76,1],[76,1],[74,1],[74,1],[72,2]];
+  const tw2=[[79,1],[79,1],[77,1],[77,1],[76,1],[76,1],[74,2]];
+  const odeA=[[78,1],[78,1],[79,1],[81,1],[81,1],[79,1],[78,1],[76,1],[74,1],[74,1],[76,1],[78,1]];
+  const eliseM1=[[76,.25],[75,.25],[76,.25],[71,.25],[74,.25],[72,.25]];
+  const eliseM2=[[69,.5],[null,.25],[60,.25],[64,.25],[69,.25]];
+  const AmL={lh:[45,52,57]}, EL={lh:[40,52,56]};
+  const GM7={bass:43,tones:[59,62,66]}, DM7={bass:38,tones:[57,61,66]};
+  const CB=[['D',50],['A',45],['Bm',47],['F#m',42],['G',43],['D',38],['G',43],['A',45]].map(([n,b])=>[{bass:b,tones:CH(n).tones},2]);
+  return [
+    {title:'Twinkle Variations', by:'Mozart', bpm:96, meter:4, length:48, style:'plain',
+     mel:[...tw1,...tw2,...tw2,...tw1],
+     segs:[['C',4],['F',2],['C',2],['F',2],['C',2],['G',2],['C',2],['C',2],['G7',2],['C',2],['G',2],['C',2],['G7',2],['C',2],['G',2],['C',4],['F',2],['C',2],['F',2],['C',2],['G',2],['C',2]]},
+    {title:'Sonata in C, K. 545', by:'Mozart', bpm:104, meter:4, length:32, style:'alberti',
+     mel:[[72,2],[76,1],[79,1],[71,1.5],[72,.25],[74,.25],[72,2],[81,2],[79,1],[84,1],[79,1],[77,1],[76,2],...runs],
+     segs:[['C',4],['G7',2],['C',2],['F',2],['C',2],['G7',2],['C',2],['F',4],['C',4],['Dm',2],['G7',2],['C',4]]},
+    {title:'Für Elise', by:'Beethoven', bpm:66, meter:1.5, length:12, style:'plain',
+     mel:[[76,.25],[75,.25],...eliseM1,...eliseM2,[71,.5],[null,.25],[64,.25],[68,.25],[71,.25],[72,.5],[null,.25],[64,.25],[76,.25],[75,.25],
+          ...eliseM1,...eliseM2,[71,.5],[null,.25],[64,.25],[72,.25],[71,.25],[69,.5],[null,.5]],
+     segs:[[null,.5],[null,1.5],[AmL,1.5],[EL,1.5],[AmL,1.5],[null,1.5],[AmL,1.5],[EL,1.5],[AmL,1]]},
+    {title:'Ode to Joy', by:'Beethoven', bpm:92, meter:4, length:32, style:'plain',
+     mel:[...odeA,[78,1.5],[76,.5],[76,2],...odeA,[76,1.5],[74,.5],[74,2]],
+     segs:[['D',4],['D',2],['A',2],['D',4],['D',2],['A',2],['D',4],['D',2],['A',2],['D',4],['A',2],['D',2]]},
+    {title:'Largo, "Going Home"', by:'Dvořák', bpm:50, meter:4, length:32, style:'plain', transpose:1,
+     mel:[[76,1.5],[79,.5],[79,2],[76,1.5],[74,.5],[72,2],[74,1],[76,1],[79,1],[76,1],[74,4],
+          [76,1.5],[79,.5],[79,2],[76,1.5],[74,.5],[72,2],[74,1],[76,1],[74,1.5],[72,.5],[72,4]],
+     segs:[['C',4],['C',4],['G',2],['C',2],['G',4],['C',4],['Fmaj7',2],['C',2],['G',2],['G7',2],['C',4]]},
+    {title:'Gymnopédie No. 1', by:'Satie', bpm:76, meter:3, length:36, style:'gymno',
+     mel:[[null,12],[null,1],[78,1],[81,1],[79,1],[78,1],[73,1],[71,1],[73,1],[74,1],[69,3],[66,6],[null,6]],
+     segs:Array.from({length:12},(_,i)=>[i%2?DM7:GM7,3])},
+    {title:'Canon in D', by:'Pachelbel', bpm:60, meter:4, length:48, style:'plain',
+     mel:[[null,16],[78,2],[76,2],[74,2],[73,2],[71,2],[69,2],[71,2],[73,2],[74,2],[73,2],[71,2],[69,2],[67,2],[66,2],[67,2],[64,2]],
+     segs:[...CB,...CB,...CB]}
+  ];
+})();
+
+/* syllables in Malayalam: each vowel or consonant cluster with its vowel is one; chillu and a final ് add none */
+function syllablesOf(ml){
+  const c=[...String(ml||'')]; let n=0;
+  for(let i=0;i<c.length;i++){
+    const k=c[i].codePointAt(0);
+    if(k>=0x0D05&&k<=0x0D14){ n++; continue; }
+    if(k>=0x0D15&&k<=0x0D3A && c[i+1]!=='\u0D4D') n++;
+  }
+  return Math.max(1,n);
+}
+const sylToIntensity = syl => Math.max(0,Math.min(1,(syl-1)/5));   // 1 syllable: quiet and sparse; 6+: full and flowing
+function hashStr(s){ let h=2166136261; for(const ch of s){ h^=ch.codePointAt(0); h=Math.imul(h,16777619); } return h>>>0; }
+
+function buildTune(T,s){
+  const d = s<.34?0 : s<.67?1 : 2, tr=T.transpose||0, ev=[];
+  let at=0;
+  for(const [m,dur] of T.mel){
+    if(m!=null){ ev.push({at,dur,n:m+tr,v:.62,part:'mel'}); if(s>.79) ev.push({at,dur,n:m+tr-12,v:.24,part:'mel'}); }
+    at+=dur;
+  }
+  at=0;
+  for(const [chd,dur] of T.segs){
+    if(chd){
+      const c = typeof chd==='string' ? CH(chd) : chd;
+      if(c.lh){
+        const lh=c.lh.map(x=>x+tr);
+        if(d===0) ev.push({at,dur:1.2,n:lh[0],v:.3,part:'acc'});
+        else lh.forEach((x,i)=>ev.push({at:at+.25*i,dur:d===2?1.4:.9,n:x,v:.28,part:'acc'}));
+      } else {
+        const bass=c.bass+tr, tones=c.tones.map(x=>x+tr);
+        if(T.style==='gymno'){
+          ev.push({at,dur:3,n:bass,v:.34,part:'acc'});
+          tones.forEach((x,i)=>ev.push({at:at+1+i*.03,dur:2,n:x,v:.19,part:'acc'}));
+          if(d===2) ev.push({at,dur,tones:tones.map(x=>x+12),v:.5,part:'pad'});
+        } else {
+          ev.push({at,dur,n:bass,v:d===0?.26:.34,part:'acc'});
+          if(d===0) tones.forEach((x,i)=>ev.push({at:at+.05*i,dur,n:x,v:.15,part:'acc'}));
+          else if(T.style==='alberti'){ const p=[tones[0],tones[2],tones[1],tones[2]]; for(let k=0;k<dur/.5;k++) ev.push({at:at+k*.5,dur:.6,n:p[k%4],v:.2,part:'acc'}); }
+          else if(d===1){ for(let k=0;k<dur;k++) ev.push({at:at+k,dur:1.6,n:tones[(k+1)%tones.length],v:.19,part:'acc'}); }
+          else { const arp=[tones[0],tones[1],tones[2],tones[0]+12,tones[1]+12,tones[0]+12,tones[2],tones[1]]; for(let k=0;k<dur/.5;k++) ev.push({at:at+k*.5,dur:.9,n:arp[k%8],v:.18,part:'acc'}); }
+          if(d===2) ev.push({at,dur,tones,v:.5,part:'pad'});
+        }
+      }
+    }
+    at+=dur;
+  }
+  ev.sort((a,b)=>a.at-b.at);
+  return ev;
+}
+
+const Music=(()=>{
+  let ctx, built=false, on=false, vol=.8, bus;
+  let choice={k:0,s:.2,syl:2}, lastK=-1, pending=null, cur=null;
+  const mtof=m=>440*Math.pow(2,(m-69)/12);
+  function impulse(sec,decay){ const sr=ctx.sampleRate,n=Math.floor(sr*sec),b=ctx.createBuffer(2,n,sr); for(let c=0;c<2;c++){ const dd=b.getChannelData(c); for(let i=0;i<n;i++) dd[i]=(Math.random()*2-1)*Math.pow(1-i/n,decay); } return b; }
+  function build(){
+    ctx=Engine.ctx;
+    bus=ctx.createGain(); bus.gain.value=0;
+    // a gentle tape wobble and a warm top end for a nostalgic feel
+    const wow=ctx.createDelay(.05); wow.delayTime.value=.012;
+    const lfo=ctx.createOscillator(), lfoG=ctx.createGain(); lfo.frequency.value=.45; lfoG.gain.value=.0009; lfo.connect(lfoG); lfoG.connect(wow.delayTime); lfo.start();
+    const warm=ctx.createBiquadFilter(); warm.type='lowpass'; warm.frequency.value=5200; warm.Q.value=.4;
+    const dry=ctx.createGain(), wet=ctx.createGain(); dry.gain.value=.85; wet.gain.value=.42;
+    const rev=ctx.createConvolver(); rev.buffer=impulse(3.4,2.6);
+    bus.connect(wow); wow.connect(warm); warm.connect(dry); dry.connect(Engine.bus); warm.connect(rev); rev.connect(wet); wet.connect(Engine.bus);
+    built=true; setInterval(tick,25);
+  }
+  function piano(t,m,d,v,dest){
+    const f=mtof(m), out=ctx.createGain(), lp=ctx.createBiquadFilter();
+    lp.type='lowpass'; lp.frequency.value=Math.min(6500,1300+f*2+2400*v); lp.Q.value=.3;
+    const peak=v*.5, ring=Math.max(.4,1.7-(m-48)/36), rel=t+Math.max(d,.16);
+    out.gain.setValueAtTime(0,t); out.gain.linearRampToValueAtTime(peak,t+.006);
+    out.gain.setTargetAtTime(peak*.45,t+.006,.09);
+    out.gain.setTargetAtTime(peak*.06,t+.13,ring);
+    out.gain.setTargetAtTime(.0001,rel,.34);
+    [[1,1],[2,.4],[3,.15],[4,.07],[5,.04],[6,.02]].forEach(([r,a])=>{
+      const o=ctx.createOscillator(), g=ctx.createGain();
+      o.frequency.value=f*r*(1+.0003*r*r); o.detune.value=(Math.random()-.5)*4;
+      g.gain.setValueAtTime(a,t); if(r>1) g.gain.setTargetAtTime(a*.2,t+.01,.45/r);
+      o.connect(g); g.connect(lp); o.start(t); o.stop(rel+1.8);
+    });
+    lp.connect(out);
+    if(ctx.createStereoPanner){ const p=ctx.createStereoPanner(); p.pan.value=Math.max(-.55,Math.min(.55,(m-62)/30)); out.connect(p); p.connect(dest); }
+    else out.connect(dest);
+  }
+  function pad(t,tones,d,v,dest){
+    tones.forEach(m=>{
+      const f=mtof(m), g=ctx.createGain(), lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1100;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(v*.07,t+.8); g.gain.setTargetAtTime(.0001,t+Math.max(d,.9),.7);
+      [-6,6].forEach(c=>{ const o=ctx.createOscillator(); o.type='triangle'; o.frequency.value=f; o.detune.value=c; o.connect(lp); o.start(t); o.stop(t+d+3.5); });
+      lp.connect(g); g.connect(dest);
+    });
+  }
+  function spqAt(c,at){ const base=60/(c.T.bpm*(.85+.35*c.s)); return at>=c.T.length-c.T.meter ? base*1.12 : base; }  // breathe at the end of each phrase
+  function startSession(p,now){
+    let delay=.25;
+    if(cur){ const old=cur.gain; old.gain.setTargetAtTime(0,now,.45); setTimeout(()=>old.disconnect(),4000); delay=.9; }
+    const g=ctx.createGain(); g.gain.value=1; g.connect(bus);
+    const T=TUNES[p.k];
+    cur={T, s:p.s, ev:buildTune(T,p.s), idx:0, qPos:0, tPos:now+delay, gain:g};
+  }
+  function play(e,t){
+    const hum=(Math.random()-.5)*.018, tt=Math.max(ctx.currentTime+.005,t+hum), sp=spqAt(cur,e.at), s=cur.s;
+    if(e.part==='pad'){ pad(tt,e.tones,e.dur*sp,e.v*(.6+.4*s),cur.gain); return; }
+    const vel=e.v*(e.part==='mel' ? .7+.5*s : .7+.45*s)*(.92+Math.random()*.16);
+    piano(tt,e.n,e.dur*sp,vel,cur.gain);
+  }
+  function tick(){
+    if(!on||ctx.state!=='running') return;
+    const now=ctx.currentTime;
+    if(pending){ startSession(pending,now); pending=null; }
+    if(!cur) return;
+    for(let guard=0; guard<128; guard++){
+      const e=cur.ev[cur.idx], sp=spqAt(cur,e.at);
+      let t=cur.tPos+(e.at-cur.qPos)*sp;
+      if(t<now-.05){ cur.tPos+=now+.05-t; t=now+.05; }
+      if(t>now+.2) break;
+      cur.tPos=t; cur.qPos=e.at; play(e,t); cur.idx++;
+      if(cur.idx>=cur.ev.length){ cur.idx=0; cur.tPos+=(cur.T.length-cur.qPos)*spqAt(cur,cur.T.length-.01)+.7; cur.qPos=0; }
+    }
+  }
+  return {
+    async toggle(v){
+      if(v){ await Engine.start('music'); if(!built) build(); on=true; cur=null; pending={...choice}; bus.gain.setTargetAtTime(vol,ctx.currentTime,.4); }
+      else { on=false; if(built) bus.gain.setTargetAtTime(0,ctx.currentTime,.3); Engine.stop('music'); }
+      return on;
+    },
+    setName(ml){
+      const syl=syllablesOf(ml), s=sylToIntensity(syl);
+      let k=hashStr(ml)%TUNES.length; if(k===lastK) k=(k+1)%TUNES.length;   // never the same tune twice in a row
+      lastK=k; choice={k,s,syl};
+      if(on) pending={...choice};
+    },
+    setVolume(v){ vol=v; if(on&&built) bus.gain.setTargetAtTime(vol,ctx.currentTime,.2); },
+    get on(){ return on; },
+    get label(){ const T=TUNES[choice.k]; return `${T.title} by ${T.by}, ${choice.syl} syllable${choice.syl>1?'s':''}`; }
+  };
+})();
+
+document.addEventListener('visibilitychange',()=>{ document.hidden ? Engine.pause() : Engine.resume(); });
+
+const sndBtn=$('snd'), musBtn=$('mus'), volRain=$('volRain'), volMusic=$('volMusic'), levelEl=$('level');
+function syncSound(){
+  volRain.hidden=!Rain.on; volMusic.hidden=!Music.on;
+  levelEl.textContent = levelName(targetI) + (Music.on ? `. ${Music.label}` : '');
+}
+function wire(btn, mod, onLabel, offLabel){
+  btn.addEventListener('click', async ()=>{
+    try{
+      const now=await mod.toggle(!mod.on);
+      btn.setAttribute('aria-pressed', String(now));
+      btn.textContent = now ? offLabel : onLabel;
+      if(now && Engine.isIOS) setStatus("No sound? Turn up the volume and check the side switch isn't on silent.");
+      syncSound();
+    }catch{ setStatus("Sound couldn't start in this browser. Tap the button again, or try another browser.", true); }
+  });
+}
+wire(sndBtn, Rain, 'Turn rain sound on', 'Turn rain sound off');
+wire(musBtn, Music, 'Turn music on', 'Turn music off');
+volRain.addEventListener('input', ()=> Rain.setVolume(volRain.value/100));
+volMusic.addEventListener('input', ()=> Music.setVolume(volMusic.value/100));
+
+/* ============ rain you can see ============ */
+const cv=$('rain'), g=cv.getContext('2d');
+let W=0,H=0, targetI=.28, curI=.28;
+const MAXD=520, drops=[], ripples=[];
+function size(){ const d=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight; cv.width=W*d; cv.height=H*d; g.setTransform(d,0,0,d,0,0); }
+size(); addEventListener('resize',size);
+function respawn(d,init){ d.x=Math.random()*(W+260)-130; d.y=init?Math.random()*H:-60-Math.random()*H*.25; d.z=Math.random(); d.len=10+d.z*34; d.v=700+d.z*900; }
+for(let i=0;i<MAXD;i++){ const d={}; respawn(d,true); drops.push(d); }
+let last=0;
+function frame(now){
+  const dt=Math.min(.05,(now-(last||now))/1000); last=now;
+  curI+=(targetI-curI)*(1-Math.exp(-dt*.6));
+  g.clearRect(0,0,W,H);
+  const n=Math.round(60+(MAXD-60)*curI), wind=.2;
+  const bins=[[],[],[]];
+  for(let i=0;i<n;i++){
+    const d=drops[i]; d.y+=d.v*dt; d.x+=d.v*dt*wind;
+    if(d.y>H+40){ respawn(d,false); }
+    bins[d.z<.34?0:d.z<.67?1:2].push(d);
+  }
+  const styles=[['rgba(225,225,225,.16)',.7],['rgba(235,235,235,.26)',1.0],['rgba(245,245,245,.38)',1.5]];
+  bins.forEach((b,k)=>{
+    g.strokeStyle=styles[k][0]; g.lineWidth=styles[k][1]; g.beginPath();
+    for(const d of b){ g.moveTo(d.x,d.y); g.lineTo(d.x-d.len*wind,d.y-d.len); }
+    g.stroke();
+  });
+  requestAnimationFrame(frame);
+}
+if(!reduceMotion) requestAnimationFrame(frame);
+
+/* ============ the river: a ripple heightfield you can disturb ============ */
+const Water=(()=>{
+  const cv=$('water'); let gl=null;
+  try{ gl=cv.getContext('webgl',{alpha:false,antialias:false,premultipliedAlpha:false}); }catch{}
+  if(!gl) return {active:false};
+  const VS='attribute vec2 p;varying vec2 s;void main(){s=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0.,1.);}';
+  const FS=`precision mediump float;
+varying vec2 s;
+uniform sampler2D t0,t1,sim,k0,k1;   // k0,k1: where the river is in each photo
+uniform vec4 m0,m1;          // image aspect, background y position, water starts, water ends (in image height)
+uniform float A,mixv,time,flow;
+vec2 cover(vec2 q,float a,float py){
+  if(A>a){ float r=a/A; return vec2(q.x, q.y*r+py*(1.-r)); }
+  float r=A/a; return vec2(q.x*r+.5*(1.-r), q.y);
+}
+float water(float v,vec4 m){ return smoothstep(m.z,m.z+.05,v)*(1.-smoothstep(m.w-.03,m.w,v)); }
+void main(){
+  vec4 h=texture2D(sim,s);
+  vec2 n=(h.rg-.5)*2.;
+  vec2 u0=cover(s,m0.x,m0.y), u1=cover(s,m1.x,m1.y);
+  float w=mix(texture2D(k0,u0).r,texture2D(k1,u1).r,mixv);
+  vec2 fl=flow*w*vec2(sin(s.y*90.-time*1.1+s.x*7.)*.0014+sin(s.y*37.+time*.7)*.0008, sin(s.x*48.+time*.9)*.0005);
+  vec2 off=n*.034*w+fl;
+  vec3 c=mix(texture2D(t0,u0+off).rgb, texture2D(t1,u1+off).rgb, mixv);
+  float g=dot(c,vec3(.299,.587,.114));
+  g=(g-.5)*1.08+.5;
+  float spec=pow(max(0.,dot(normalize(vec3(n*2.5,1.)),normalize(vec3(-.45,-.6,.66)))),28.)*w;
+  g+=spec*.55;
+  gl_FragColor=vec4(vec3(g),1.);
+}`;
+  function sh(type,src){ const o=gl.createShader(type); gl.shaderSource(o,src); gl.compileShader(o); if(!gl.getShaderParameter(o,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(o)); return o; }
+  let prog;
+  try{ prog=gl.createProgram(); gl.attachShader(prog,sh(gl.VERTEX_SHADER,VS)); gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,FS)); gl.linkProgram(prog); if(!gl.getProgramParameter(prog,gl.LINK_STATUS)) throw 0; }
+  catch{ return {active:false}; }
+  gl.useProgram(prog);
+  const U={}; ['t0','t1','sim','k0','k1','m0','m1','A','mixv','time','flow'].forEach(k=>U[k]=gl.getUniformLocation(prog,k));
+  const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const ap=gl.getAttribLocation(prog,'p'); gl.enableVertexAttribArray(ap); gl.vertexAttribPointer(ap,2,gl.FLOAT,false,0,0);
+  function tex(){ const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE); return t; }
+
+  // photos: same images as the CSS fallback layers, plus where the water is in each
+  const META=[
+    {py:.68, ws:.545,we:1.05, river:[[0,.668],[1,.668],[1,.765],[.93,.80],[.86,.87],[.78,.905],[.70,.925],[.5,.93],[.3,.928],[.12,.935],[0,.94]]},
+    {py:.60, ws:.585,we:1.05, river:[[0,.612],[1,.612],[1,1],[0,1]]},
+    {py:.62, ws:.685,we:.94,  river:[[0,.708],[1,.708],[1,.928],[0,.928]]}
+  ];
+  function riverMask(poly){
+    const c=document.createElement('canvas'); c.width=256; c.height=512;
+    const x=c.getContext('2d'); x.fillStyle='#000'; x.fillRect(0,0,256,512);
+    x.filter='blur(3px)'; x.fillStyle='#fff'; x.beginPath();
+    poly.forEach(([px,py],i)=>x[i?'lineTo':'moveTo'](px*256,py*512)); x.closePath(); x.fill();
+    return c;
+  }
+  const layers=[...document.querySelectorAll('.bg i')];
+  const photos=layers.map((el,i)=>{ const im=new Image(); im.src=getComputedStyle(el).backgroundImage.replace(/^url\(["']?/,'').replace(/["']?\)$/,''); return {im, tex:null, aspect:1, ...META[i]}; });
+
+  // ripple simulation (two-buffer wave equation), computed on the CPU, uploaded as a small texture
+  const simTex=tex();
+  let ww=0, hh=0, cols=0, rows=0, cur, prev, pix;
+  function alloc(){
+    const d=Math.min(devicePixelRatio||1,1.5); ww=innerWidth; hh=innerHeight;
+    cv.width=Math.round(ww*d); cv.height=Math.round(hh*d); gl.viewport(0,0,cv.width,cv.height);
+    cols=Math.max(70,Math.min(260,Math.round(ww/5.5))); rows=Math.max(8,Math.round(cols*hh/ww));
+    cur=new Float32Array(cols*rows); prev=new Float32Array(cols*rows); pix=new Uint8Array(cols*rows*4).fill(128);
+    gl.bindTexture(gl.TEXTURE_2D,simTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,cols,rows,0,gl.RGBA,gl.UNSIGNED_BYTE,pix);
+  }
+  alloc();
+  let rt; addEventListener('resize',()=>{ clearTimeout(rt); rt=setTimeout(alloc,150); });
+
+  function poke(x,y,r,str){
+    const cx=x/ww*cols, cy=y/hh*rows, R=Math.ceil(r)+1;
+    for(let j=Math.max(1,Math.floor(cy-R)); j<=Math.min(rows-2,Math.ceil(cy+R)); j++)
+      for(let i=Math.max(1,Math.floor(cx-R)); i<=Math.min(cols-2,Math.ceil(cx+R)); i++){
+        const d=Math.hypot(i-cx,j-cy); if(d<r) cur[j*cols+i]+=str*(.5+.5*Math.cos(Math.PI*d/r));
+      }
+  }
+  function step(){
+    for(let y=1;y<rows-1;y++){ const o=y*cols; for(let x=1;x<cols-1;x++){ const i=o+x;
+      prev[i]=((cur[i-1]+cur[i+1]+cur[i-cols]+cur[i+cols])*.5-prev[i])*.984; } }
+    const t=cur; cur=prev; prev=t;
+  }
+  function encode(){
+    for(let y=1;y<rows-1;y++){ const o=y*cols; for(let x=1;x<cols-1;x++){ const i=o+x, q=i*4;
+      const gx=cur[i-1]-cur[i+1], gy=cur[i-cols]-cur[i+cols];
+      pix[q]=Math.max(0,Math.min(255,128+gx*90)); pix[q+1]=Math.max(0,Math.min(255,128+gy*90)); } }
+    gl.bindTexture(gl.TEXTURE_2D,simTex); gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,cols,rows,gl.RGBA,gl.UNSIGNED_BYTE,pix);
+  }
+
+  // people disturb the water: moving stirs it, more movement stirs it more, a tap drops a stone
+  let lastP=null, agit=0;
+  addEventListener('pointermove',e=>{
+    const p={x:e.clientX,y:e.clientY,t:e.timeStamp};
+    if(lastP){
+      const dx=p.x-lastP.x, dy=p.y-lastP.y, dist=Math.hypot(dx,dy), dtm=Math.max(8,p.t-lastP.t);
+      if(dist>0 && dist<400){
+        agit=Math.min(4, agit+(dist/dtm)*.06);
+        const steps=Math.min(14,Math.ceil(dist/(ww/cols*1.5))), str=(.3+.45*agit)*1.8/steps, r=1.2+Math.min(2.2,agit*.6);
+        for(let k=1;k<=steps;k++) poke(lastP.x+dx*k/steps, lastP.y+dy*k/steps, r, str);
+      }
+    }
+    lastP=p;
+  },{passive:true});
+  const forget=()=>{ lastP=null; };
+  addEventListener('pointerup',e=>{ if(e.pointerType!=='mouse') forget(); },{passive:true});
+  addEventListener('pointercancel',forget,{passive:true});
+  document.addEventListener('mouseleave',forget);
+  addEventListener('pointerdown',e=>{
+    if(e.target.closest && e.target.closest('input,textarea,select,button,summary,a,label,table')) return;
+    poke(e.clientX,e.clientY,2.6,2.8+agit*.5); agit=Math.min(4,agit+.6);
+  },{passive:true});
+
+  let ready=false, startT=0, last=0, acc=0, rainAcc=0;
+  function frame(now){
+    const dt=Math.min(.05,(now-(last||now))/1000); last=now;
+    agit*=Math.exp(-dt*1.1);
+    acc+=dt; let n=0; while(acc>=1/60 && n<3){ step(); acc-=1/60; n++; } if(n===3) acc=0;
+    encode();
+    const el=reduceMotion?0:Math.max(0,(now-startT)/1000), seg=200;
+    const idx=Math.floor(el/seg)%3, local=el%seg, mx=Math.min(1,Math.max(0,(local-140)/60));
+    const a=photos[idx], b=photos[(idx+1)%3], sm=mx*mx*(3-2*mx);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,a.tex);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,b.tex);
+    gl.activeTexture(gl.TEXTURE2); gl.bindTexture(gl.TEXTURE_2D,simTex);
+    gl.activeTexture(gl.TEXTURE3); gl.bindTexture(gl.TEXTURE_2D,a.mask);
+    gl.activeTexture(gl.TEXTURE4); gl.bindTexture(gl.TEXTURE_2D,b.mask);
+    gl.uniform1i(U.t0,0); gl.uniform1i(U.t1,1); gl.uniform1i(U.sim,2); gl.uniform1i(U.k0,3); gl.uniform1i(U.k1,4);
+    gl.uniform4f(U.m0,a.aspect,a.py,a.ws,a.we); gl.uniform4f(U.m1,b.aspect,b.py,b.ws,b.we);
+    gl.uniform1f(U.A,ww/hh); gl.uniform1f(U.mixv,sm); gl.uniform1f(U.time,now/1000); gl.uniform1f(U.flow,0);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    requestAnimationFrame(frame);
+  }
+  Promise.all(photos.map(ph=>ph.im.decode ? ph.im.decode() : new Promise((r,j)=>{ ph.im.onload=r; ph.im.onerror=j; })))
+    .then(()=>{
+      photos.forEach(ph=>{ ph.tex=tex(); gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,ph.im); ph.aspect=ph.im.naturalWidth/ph.im.naturalHeight;
+        ph.mask=tex(); gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,riverMask(ph.river)); });
+      ready=true; startT=performance.now(); requestAnimationFrame(frame);
+      requestAnimationFrame(()=>{ document.documentElement.classList.add('gl'); setTimeout(()=>document.documentElement.classList.add('gl-ready'),1600); });
+    }).catch(()=>{});
+  cv.addEventListener('webglcontextlost',e=>{ e.preventDefault(); document.documentElement.classList.remove('gl','gl-ready'); });
+  return {active:true, poke};
+})();
+
+/* ============ the glass: the name is never drawn, it condenses ============
+   Like a word once traced with a finger on a window, the name only shows when water finds it.
+   Every drop follows a few small rules, and the lettering is whatever those rules add up to:
+   1. Rain lands anywhere on the glass. Mist condenses more where the name was traced.
+   2. Off the name, water evaporates. On the name, it clings and slowly swells.
+   3. Drops that touch become one drop, keeping their volume.
+   4. A drop too heavy for the glass to hold slides down, leaving a beaded trail and swallowing what it meets,
+      until it reaches glass sticky enough to hold it, so drips pool in the lower strokes.
+   5. Dragging across the name wipes the glass; the pushed water piles up at the edge of the wipe and runs.
+   Nothing here knows what a letter is. The name's own weather (how hard it rains) sets how it behaves. */
+const Pane=(()=>{
+  const none={active:false, setWord(){}, refresh(){}};
+  const stage=document.querySelector('.stage');
+  if(reduceMotion || !stage) return none;
+  const cv=document.createElement('canvas'); cv.id='pane'; cv.setAttribute('aria-hidden','true');
+  const g=cv.getContext('2d'); if(!g) return none;
+  stage.prepend(cv); document.documentElement.classList.add('pane');
+
+  let W=1,H=1, dpr=1;
+  const mk=document.createElement('canvas'), mg=mk.getContext('2d',{willReadFrequently:true});
+  let MS=3, mw=1, mh=1, stick=new Float32Array(1), dew=[], fontPx=150, S=1, lines=[], glyphEl=null;
+
+  function size(){
+    const r=stage.getBoundingClientRect(); dpr=Math.min(devicePixelRatio||1,2);
+    W=Math.max(1,r.width); H=Math.max(1,r.height);
+    cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); g.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function measure(){
+    if(!glyphEl || !glyphEl.isConnected) return;
+    const sr=stage.getBoundingClientRect();
+    fontPx=parseFloat(glyphEl.style.fontSize)||150;
+    S=Math.max(.52,Math.min(1.25,fontPx/150));
+    MS=Math.max(2,fontPx/55);
+    lines=[...glyphEl.querySelectorAll('.line')].map(l=>{ const r=l.getBoundingClientRect(); return {text:l.textContent, x:r.left+r.width/2-sr.left, y:r.top+r.height/2-sr.top}; });
+    mw=Math.max(1,Math.ceil(W/MS)); mh=Math.max(1,Math.ceil(H/MS));
+    mk.width=mw; mk.height=mh;
+    mg.textAlign='center'; mg.textBaseline='middle'; mg.fillStyle='#fff';
+    const draw=blur=>{
+      mg.clearRect(0,0,mw,mh);
+      mg.font=`800 ${fontPx/MS}px "Baloo Chettan 2","Manjari","Noto Sans Malayalam",sans-serif`;
+      if(blur) mg.filter=`blur(${(fontPx/MS/26).toFixed(2)}px)`;
+      lines.forEach(l=>mg.fillText(l.text,l.x/MS,l.y/MS));
+      mg.filter='none';
+      return mg.getImageData(0,0,mw,mh).data;
+    };
+    const sharp=draw(false), soft=draw(true);
+    stick=new Float32Array(mw*mh); dew=[];
+    for(let i=0;i<mw*mh;i++){
+      const a=sharp[i*4+3]/255, b=soft[i*4+3]/255;
+      stick[i]=Math.max(a,b*.55);
+      if(a>.55) dew.push(i);
+    }
+  }
+  const stickAt=(x,y)=> (x<0||y<0||x>=W||y>=H) ? 0 : stick[(y/MS|0)*mw+(x/MS|0)]||0;
+
+  /* one drop, painted once: clear in the middle, bright at the rim, light focused at the bottom, a glint at the top */
+  const SP=document.createElement('canvas'); SP.width=SP.height=96;
+  (()=>{ const s=SP.getContext('2d'), c=48, R=42;
+    let gr=s.createRadialGradient(c+2,c+5,R*.5,c+2,c+5,R+4); gr.addColorStop(0,'rgba(0,0,0,.38)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+    s.fillStyle=gr; s.beginPath(); s.arc(c+2,c+5,R+4,0,7); s.fill();
+    gr=s.createRadialGradient(c,c+R*.12,R*.05,c,c,R);
+    gr.addColorStop(0,'rgba(244,244,244,.14)'); gr.addColorStop(.62,'rgba(244,244,244,.22)'); gr.addColorStop(.88,'rgba(244,244,244,.66)'); gr.addColorStop(1,'rgba(244,244,244,0)');
+    s.fillStyle=gr; s.beginPath(); s.arc(c,c,R,0,7); s.fill();
+    gr=s.createRadialGradient(c,c+R*.58,0,c,c+R*.58,R*.62); gr.addColorStop(0,'rgba(255,255,255,.6)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+    s.save(); s.beginPath(); s.arc(c,c,R*.86,0,7); s.clip(); s.fillStyle=gr; s.fillRect(0,0,96,96); s.restore();
+    gr=s.createRadialGradient(c-R*.34,c-R*.4,0,c-R*.34,c-R*.4,R*.3); gr.addColorStop(0,'rgba(255,255,255,.95)'); gr.addColorStop(1,'rgba(255,255,255,0)');
+    s.fillStyle=gr; s.beginPath(); s.arc(c-R*.34,c-R*.4,R*.3,0,7); s.fill();
+  })();
+  const SPR=96/2/42;   // sprite half-size per unit of drop radius
+
+  let drops=[]; const MAXN=4000;
+  const add=(x,y,r)=>{ if(drops.length<MAXN) drops.push({x,y,r,vx:0,vy:0,trail:0,seed:Math.random()*6.283,dead:false}); };
+
+  let rainAcc=0, dewAcc=0, I=.3, wordT=0;
+  const FORM=3, READ=3, EASE=2;   // seconds to condense, seconds held still to read, seconds to ease into dripping
+  function step(dt){
+    I=curI; wordT+=dt;
+    const calm=Math.min(1,Math.max(0,(wordT-FORM-READ)/EASE));   // 0 while people read, 1 once the glass is alive again
+    // 1. rain everywhere, mist on the name
+    rainAcc+=W*H*(.00008+.00045*I)*dt;
+    for(;rainAcc>=1;rainAcc--) add(Math.random()*W, Math.random()*H, S*(.4+Math.random()*Math.random()*(1.1+2.2*I)));
+    dewAcc+=dew.length*(.5+.3*I)*dt;
+    for(;dewAcc>=1 && dew.length;dewAcc--){ const i=dew[Math.random()*dew.length|0]; add((i%mw+Math.random())*MS, ((i/mw|0)+Math.random())*MS, S*(.45+Math.random()*.9)); }
+
+    const n=drops.length;
+    for(let k=0;k<n;k++){
+      const d=drops[k]; if(d.dead) continue;
+      const st=stickAt(d.x,d.y);
+      // 2. evaporate off the name, swell on it
+      d.r += (st>.3 ? .05*S*st*(.5+d.seed/6.283) : -.9*S*(1-st))*dt;
+      // 4. too heavy to hold: slide
+      const hold=S*(1.1+3.5*st)*(1.08-.22*I);
+      const held = st>.3 && d.seed/6.283>=calm;   // drops are let go one by one, not all at once
+      if(held){ if(d.r>hold) d.r=hold; d.vy*=Math.exp(-dt*20); }
+      const over=d.r-hold;
+      if(over>0 && !held) d.vy=Math.min(320*S+60, d.vy+(220*over/S+40)*dt);
+      else d.vy*=Math.exp(-dt*(6+18*st));
+      if(d.vy>3){
+        d.vx+=(Math.sin(d.seed+d.y*.045)*26*S-d.vx)*Math.min(1,dt*4);
+        d.x+=d.vx*dt; d.y+=d.vy*dt; d.trail+=d.vy*dt;
+        if(d.trail>S*(2.5+d.r*.9)){
+          d.trail=0;
+          if(Math.random()<.75){ const tr=d.r*(.2+Math.random()*.16); add(d.x+(Math.random()-.5)*d.r*.4, d.y-d.r*.95, tr); d.r=Math.cbrt(Math.max(0,d.r**3-tr**3)); }
+        }
+      }
+      if(d.r<.22*S || d.y-d.r>H+4 || d.x<-30 || d.x>W+30) d.dead=true;
+    }
+
+    // 3. touching drops become one
+    const cs=Math.max(6,20*S), gw=Math.ceil(W/cs)+2, gh=Math.ceil(H/cs)+2, cells=new Array(gw*gh);
+    for(let k=0;k<drops.length;k++){ const d=drops[k]; if(d.dead) continue;
+      const cx=Math.min(gw-1,Math.max(0,(d.x/cs|0)+1)), cy=Math.min(gh-1,Math.max(0,(d.y/cs|0)+1)), c=cy*gw+cx;
+      (cells[c]||(cells[c]=[])).push(k); }
+    for(let c=0;c<cells.length;c++){ const here=cells[c]; if(!here) continue;
+      const cx=c%gw, cy=c/gw|0;
+      for(const ia of here){ const a=drops[ia]; if(a.dead) continue;
+        for(let oy=-1;oy<=1;oy++) for(let ox=-1;ox<=1;ox++){
+          const nx=cx+ox, ny=cy+oy; if(nx<0||ny<0||nx>=gw||ny>=gh) continue;
+          const there=cells[ny*gw+nx]; if(!there) continue;
+          for(const ib of there){ if(ib<=ia) continue; const b=drops[ib]; if(b.dead||a.dead) continue;
+            const dx=b.x-a.x, dy=b.y-a.y, rr=(a.r+b.r)*.82;
+            if(dx*dx+dy*dy<rr*rr){
+              const big=a.r>=b.r?a:b, sm=big===a?b:a, va=big.r**3, vb=sm.r**3, v=va+vb;
+              big.x=(big.x*va+sm.x*vb)/v; big.y=(big.y*va+sm.y*vb)/v;
+              big.r=Math.cbrt(v); big.vy=Math.max(big.vy,sm.vy*.8); sm.dead=true;
+            }
+          }
+        }
+      }
+    }
+    drops=drops.filter(d=>!d.dead);
+  }
+
+  function paint(){
+    g.clearRect(0,0,W,H);
+    for(const d of drops){
+      const r=d.r*SPR, st=Math.min(1.7,1+d.vy/(260*S+40)*.6);
+      g.drawImage(SP, d.x-r/st, d.y-r*st*.92, 2*r/st, 2*r*st);
+    }
+  }
+
+  // 5. wiping the glass
+  let wiping=null;
+  function wipeTo(x,y){
+    const R=Math.max(10,16*S);
+    const from=wiping||{x,y}, dist=Math.hypot(x-from.x,y-from.y), steps=Math.max(1,Math.ceil(dist/(R*.4)));
+    for(let k=1;k<=steps;k++){
+      const px=from.x+(x-from.x)*k/steps, py=from.y+(y-from.y)*k/steps;
+      for(const d of drops){
+        const dx=d.x-px, dy=d.y-py, q=Math.hypot(dx,dy);
+        if(q<R+d.r*.5){ if(q<.5){ d.dead=true; continue; } const t=(R+d.r*.6)/q; d.x=px+dx*t; d.y=py+dy*t; d.r*=.985; }
+      }
+    }
+    wiping={x,y};
+  }
+  const local=e=>{ const r=stage.getBoundingClientRect(); return {x:e.clientX-r.left, y:e.clientY-r.top}; };
+  const word=document.getElementById('word');
+  word.addEventListener('pointerdown',e=>{ const p=local(e); wiping=null; wipeTo(p.x,p.y); try{ word.setPointerCapture(e.pointerId); }catch{} });
+  word.addEventListener('pointermove',e=>{ if(wiping){ const p=local(e); wipeTo(p.x,p.y); } });
+  const stop=()=>{ wiping=null; };
+  word.addEventListener('pointerup',stop); word.addEventListener('pointercancel',stop); word.addEventListener('lostpointercapture',stop);
+
+  let last=0;
+  function frame(now){
+    const dt=Math.min(.05,(now-(last||now))/1000); last=now;
+    if(!document.hidden){ step(dt); paint(); }
+    requestAnimationFrame(frame);
+  }
+  size();
+  if(window.ResizeObserver) new ResizeObserver(()=>{ size(); measure(); }).observe(stage);
+  else addEventListener('resize',()=>{ size(); measure(); });
+  requestAnimationFrame(frame);
+
+  return {
+    active:true,
+    async setWord(el){
+      glyphEl=el; wordT=0;
+      try{ await document.fonts.load(`800 40px "Baloo Chettan 2"`, el.textContent); }catch{}
+      if(glyphEl!==el) return;
+      size(); measure();
+      // a few drops shiver loose from the old name as the glass changes
+      drops.forEach(d=>{ if(stickAt(d.x,d.y)<.3 && d.r>S*1.1) d.vy=Math.max(d.vy,20); });
+    },
+    refresh(){ size(); measure(); }
+  };
+})();
+
+function setRain(ml){
+  targetI=intensityOf(ml);
+  Rain.setIntensity(targetI);
+  Music.setName(ml);
+  syncSound();
+}
+
+/* ============ conversion without Claude: a built-in name list, then spelling rules ============ */
+const NAME_LIST = (()=>{
+  const raw = {
+  // Kerala names
+  'lakshmi':'ലക്ഷ്മി','arjun':'അർജുൻ','unnikrishnan':'ഉണ്ണികൃഷ്ണൻ','unni':'ഉണ്ണി','krishnan':'കൃഷ്ണൻ','krishna':'കൃഷ്ണ',
+  'sreekutty|sreekutti|srikutty':'ശ്രീക്കുട്ടി','sree|sri':'ശ്രീ','sreeja|sreeja':'ശ്രീജ','sreelakshmi|srilakshmi':'ശ്രീലക്ഷ്മി','sreenivasan|srinivasan':'ശ്രീനിവാസൻ',
+  'anjali':'അഞ്ജലി','anju':'അഞ്ജു','parvathy|parvathi|parvati':'പാർവതി','hareesh|harish':'ഹരീഷ്','hari':'ഹരി','meenakshi':'മീനാക്ഷി','meera':'മീര',
+  'gopika':'ഗോപിക','gopi':'ഗോപി','vishnu':'വിഷ്ണു','ganesh':'ഗണേഷ്','ganesan':'ഗണേശൻ','suresh':'സുരേഷ്','ramesh':'രമേഷ്','rajesh':'രാജേഷ്','mahesh':'മഹേഷ്',
+  'dinesh':'ദിനേശ്','rajan':'രാജൻ','raju':'രാജു','ravi':'രവി','radha':'രാധ','sita|seetha|sitha':'സീത','geetha|gita|geeta':'ഗീത','usha':'ഉഷ','latha':'ലത',
+  'sheela':'ഷീല','leela':'ലീല','sarojini':'സരോജിനി','kamala':'കമല','kamalam':'കമലം','janaki':'ജാനകി','devi':'ദേവി','deepa':'ദീപ','divya':'ദിവ്യ',
+  'arya':'ആര്യ','athira':'ആതിര','aswathy|aswathi|ashwathi':'അശ്വതി','anagha':'അനഘ','amrutha|amritha':'അമൃത','nandana':'നന്ദന','nandini':'നന്ദിനി',
+  'neha':'നേഹ','priya':'പ്രിയ','remya|ramya':'രമ്യ','reshma':'രേഷ്മ','revathy|revathi':'രേവതി','sandhya':'സന്ധ്യ','sneha':'സ്നേഹ','sruthi|shruthi|shruti':'ശ്രുതി',
+  'swathi|swathy':'സ്വാതി','vidya':'വിദ്യ','abhishek':'അഭിഷേക്','akhil':'അഖിൽ','amal':'അമൽ','anand':'ആനന്ദ്','anil':'അനിൽ','arun':'അരുൺ','ajith|ajit':'അജിത്ത്',
+  'balan':'ബാലൻ','gokul':'ഗോകുൽ','jayan':'ജയൻ','jayakumar':'ജയകുമാർ','kannan':'കണ്ണൻ','manoj':'മനോജ്','midhun|mithun':'മിഥുൻ','mohanlal':'മോഹൻലാൽ',
+  'mohan':'മോഹൻ','nikhil':'നിഖിൽ','pradeep':'പ്രദീപ്','prasad':'പ്രസാദ്','rahul':'രാഹുൽ','rohit|rohith':'രോഹിത്','sajeev':'സജീവ്','sanjay':'സഞ്ജയ്',
+  'santhosh|santosh':'സന്തോഷ്','shyam':'ശ്യാം','sudheer|sudhir':'സുധീർ','sunil':'സുനിൽ','vineeth|vineet':'വിനീത്','vivek':'വിവേക്','ammu':'അമ്മു','achu':'അച്ചു',
+  'appu':'അപ്പു','ammini':'അമ്മിണി','madhavan':'മാധവൻ','narayanan':'നാരായണൻ','gopalan':'ഗോപാലൻ','velayudhan':'വേലായുധൻ','padmini':'പത്മിനി','nalini':'നളിനി',
+  'sarada|saradha|sharada':'ശാരദ','kalyani':'കല്യാണി','malathi|malati':'മാലതി','thankam':'തങ്കം','omana':'ഓമന','kunjamma':'കുഞ്ഞമ്മ',
+  // Kerala Christian names
+  'sebastian':'സെബാസ്റ്റ്യൻ','thomas':'തോമസ്','mariamma':'മറിയാമ്മ','mary':'മേരി','joseph':'ജോസഫ്','jose':'ജോസ്','annamma':'അന്നമ്മ','anna':'അന്ന','ann|anne':'ആൻ',
+  'kuriakose':'കുര്യാക്കോസ്','elizabeth':'എലിസബത്ത്','varghese|varghees':'വർഗീസ്','george':'ജോർജ്','mathew|matthew':'മാത്യു','john':'ജോൺ','johnson':'ജോൺസൺ',
+  'jacob':'ജേക്കബ്','joy':'ജോയ്','abraham':'അബ്രഹാം','philip':'ഫിലിപ്പ്','paul':'പോൾ','peter':'പീറ്റർ','antony|anthony':'ആന്റണി','sajan':'സാജൻ','biju':'ബിജു',
+  'shiny':'ഷൈനി','tessa':'ടെസ്സ','teresa|theresa':'തെരേസ','rosamma':'റോസമ്മ','rose':'റോസ്','reena':'റീന','jincy':'ജിൻസി','jibin':'ജിബിൻ','jomon':'ജോമോൻ',
+  'kunjumon':'കുഞ്ഞുമോൻ','chacko':'ചാക്കോ','ouseph':'ഔസേപ്പ്','eliyamma':'ഏലിയാമ്മ','achamma':'അച്ചാമ്മ','saramma':'സാറാമ്മ','susan':'സൂസൻ','daniel':'ഡാനിയേൽ',
+  'david':'ഡേവിഡ്','christy':'ക്രിസ്റ്റി','maria':'മരിയ',
+  // Kerala Muslim names
+  'fathima|fatima|fathimah':'ഫാത്തിമ','muhammad|mohammed|muhammed|mohammad':'മുഹമ്മദ്','ayisha|ayesha|aisha':'ആയിഷ','zainaba|zainab':'സൈനബ',
+  'abdulrahman|abdurahman':'അബ്ദുൽ റഹ്മാൻ','abdul':'അബ്ദുൽ','rahman':'റഹ്മാൻ','shahid':'ഷാഹിദ്','ali':'അലി','ahmed|ahammed|ahmad':'അഹമ്മദ്','ashraf':'അഷ്റഫ്',
+  'basheer|bashir':'ബഷീർ','hamza':'ഹംസ','ibrahim':'ഇബ്രാഹിം','ismail':'ഇസ്മായിൽ','kabeer|kabir':'കബീർ','rasheed|rashid':'റഷീദ്','salim|saleem':'സലീം',
+  'shameer':'ഷമീർ','siddique|siddiq':'സിദ്ദീഖ്','usman':'ഉസ്മാൻ','yusuf|yousuf':'യൂസഫ്','zubair':'സുബൈർ','khadeeja|khadija':'ഖദീജ','mumtaz':'മുംതാസ്',
+  'nadia|nadiya':'നാദിയ','nasreen':'നസ്രീൻ','safiya|safiyya':'സഫിയ','sajna':'സജ്ന','shabana':'ഷബാന','sulekha':'സുലേഖ','suhara':'സുഹറ','jameela':'ജമീല','beevi':'ബീവി',
+  // names from elsewhere
+  'leah|lia':'ലിയ','zoe|zoey':'സോയി','emily':'എമിലി','oliver':'ഒലിവർ','charlotte':'ഷാർലറ്റ്','sophia|sofia':'സോഫിയ','hannah|hana':'ഹന്ന','siobhan':'ഷിവോൺ',
+  'emma':'എമ്മ','olivia':'ഒലീവിയ','ava':'ഏവ','mia':'മിയ','noah':'നോവ','liam':'ലിയാം','james':'ജെയിംസ്','william':'വില്യം','lucas':'ലൂക്കാസ്','ethan':'ഈഥൻ',
+  'sarah|sara':'സാറ','grace':'ഗ്രേസ്','chloe':'ക്ലോയി','lily|lilly':'ലില്ലി','jack':'ജാക്ക്','michael':'മൈക്കിൾ','chris':'ക്രിസ്','alex':'അലക്സ്','sam':'സാം',
+  'ben':'ബെൻ','kevin':'കെവിൻ','neil':'നീൽ','nina':'നീന','tina':'ടീന','diana':'ഡയാന','julia':'ജൂലിയ','laura':'ലോറ','rachel':'റേച്ചൽ','robert':'റോബർട്ട്',
+  'steve':'സ്റ്റീവ്','stephen|steven':'സ്റ്റീഫൻ','tom':'ടോം','jenny':'ജെന്നി','nicole':'നിക്കോൾ','isabella':'ഇസബെല്ല','amelia':'അമേലിയ',
+  // family words
+  'ammachi':'അമ്മച്ചി','ammoomma|ammumma':'അമ്മൂമ്മ','ammamma':'അമ്മമ്മ','appooppan|appuppan':'അപ്പൂപ്പൻ','achachan':'അച്ചാച്ചൻ','amma':'അമ്മ','achan|achhan':'അച്ഛൻ',
+  'appa':'അപ്പ','chechi':'ചേച്ചി','chettan':'ചേട്ടൻ','ikka':'ഇക്ക','itha|itta':'ഇത്ത','umma':'ഉമ്മ','uppa':'ഉപ്പ','muthassi':'മുത്തശ്ശി','muthassan':'മുത്തശ്ശൻ',
+  'valiyammachi|valyammachi':'വല്യമ്മച്ചി','appachan':'അപ്പച്ചൻ','mazha':'മഴ'
+  };
+  const map={};
+  for(const [k,v] of Object.entries(raw)) k.split('|').forEach(x=>map[x]=v);
+  return map;
+})();
+
+/* Manglish spelling rules, used only when a name isn't on the list and Claude isn't available */
+const ML_RULES=(()=>{
+  const V=[['aa','ആ','ാ'],['ai','ഐ','ൈ'],['au','ഔ','ൗ'],['ee','ഈ','ീ'],['ii','ഈ','ീ'],['oo','ഊ','ൂ'],['uu','ഊ','ൂ'],['ou','ഔ','ൗ'],['oa','ഓ','ോ'],
+           ['a','അ',''],['i','ഇ','ി'],['u','ഉ','ു'],['e','എ','െ'],['o','ഒ','ൊ']];
+  const C=[['chh','ഛ'],['cch','ച്ച'],['ksh','ക്ഷ'],['tth','ത്ത'],['nth','ന്ത'],['ng','NG'],['nj','ഞ്ജ'],['nk','ങ്ക'],['nd','ന്ദ'],
+           ['kh','ഖ'],['gh','ഘ'],['ch','ച'],['jh','ഝ'],['th','ത'],['dh','ധ'],['ph','ഫ'],['bh','ഭ'],['sh','ഷ'],['zh','ഴ'],
+           ['tt','ട്ട'],['kk','ക്ക'],['cc','ക്ക'],['pp','പ്പ'],['mm','മ്മ'],['nn','ന്ന'],['ll','ല്ല'],['rr','റ'],['ss','സ്സ'],['yy','യ്യ'],['vv','വ്വ'],
+           ['jj','ജ്ജ'],['dd','ദ്ദ'],['bb','ബ്ബ'],['gg','ഗ്ഗ'],
+           ['k','ക'],['c','ക'],['g','ഗ'],['j','ജ'],['t','T'],['d','ദ'],['n','ന'],['p','പ'],['b','ബ'],['m','മ'],['y','യ'],['r','ര'],
+           ['l','ല'],['v','വ'],['w','വ'],['s','സ'],['h','ഹ'],['f','ഫ'],['z','സ'],['q','ക്ക'],['x','ക്സ']];
+  const CHILLU={'ന':'ൻ','ര':'ർ','ല':'ൽ','ണ':'ൺ','ള':'ൾ'};
+  function tokens(w){
+    const out=[]; let i=0;
+    while(i<w.length){
+      const v=V.find(([l])=>w.startsWith(l,i)); if(v){ out.push({t:'V',ind:v[1],sign:v[2],l:v[0]}); i+=v[0].length; continue; }
+      const c=C.find(([l])=>w.startsWith(l,i)); if(c){ out.push({t:'C',ml:c[1],l:c[0]}); i+=c[0].length; continue; }
+      i++;
+    }
+    return out;
+  }
+  const isCons=x=>x && x.t==='C';
+  function longCtx(tk,j){ const c=tk[j], v=tk[j+1]; return isCons(c) && c.ml.length===1 && v && v.t==='V'; }
+  function sign(v,tk,j){ if(v.l==='e'&&longCtx(tk,j)) return 'േ'; if(v.l==='o'&&longCtx(tk,j)) return 'ോ'; return v.sign; }
+  function word(w){
+    w=w.replace(/([^aeiouy])y$/,'$1i').replace(/([^aeiou])e$/,'$1');
+    const tk=tokens(w); let s='';
+    for(let i=0;i<tk.length;i++){
+      const a=tk[i], nx=tk[i+1], pv=tk[i-1];
+      if(a.t==='V'){
+        if(pv && pv.t==='V'){ const glide=/^(i|ee|ii|e|ai)$/.test(pv.l)?'യ':'വ'; s+=glide+sign(a,tk,i+1); }
+        else s+= (a.l==='o'&&longCtx(tk,i+1)) ? 'ഓ' : a.ind;
+        continue;
+      }
+      let ml=a.ml;
+      if(ml==='T') ml = (pv&&pv.t==='V'&&nx&&nx.t==='V') ? 'റ്റ' : 'ട';
+      if(ml==='NG'){ if(nx&&nx.t==='V'){ s+='ംഗ'+sign(nx,tk,i+2); i++; } else s+='ങ്'; continue; }
+      if(nx && nx.t==='V'){ s+=ml+sign(nx,tk,i+2); i++; continue; }
+      if(!nx){ s+= CHILLU[ml] || (ml==='മ'?'ം':ml+'്'); continue; }
+      if(ml==='ര' && nx.ml!=='യ') s+='ർ'; else if(ml==='ല') s+='ൽ'; else if(ml==='മ' && nx.ml!=='മ') s+='ം'; else s+=ml+'്';
+    }
+    return s.replace(/ക്രിഷ്ന/g,'കൃഷ്ണ').replace(/ഷ്ന/g,'ഷ്ണ');
+  }
+  return name => name.toLowerCase().split(/\s+/).map(x=>x.replace(/[^a-z]/g,'')).filter(Boolean).map(word).join(' ');
+})();
+
+function offlineName(name){
+  const words=name.toLowerCase().trim().split(/\s+/);
+  const whole=words.join('');
+  if(NAME_LIST[whole]) return {ml:NAME_LIST[whole], listed:true};
+  let listed=true;
+  const ml=words.map(w=>{ const k=w.replace(/[^a-z]/g,''); if(NAME_LIST[k]) return NAME_LIST[k]; listed=false; return ML_RULES(k); }).filter(Boolean).join(' ');
+  return {ml, listed};
+}
+
+/* ============ Malayalam handling ============ */
+function normalizeML(s){
+  return String(s||'').normalize('NFC')
+    .replace(/\u0D28\u0D4D\u200D/g,'\u0D7B').replace(/\u0D23\u0D4D\u200D/g,'\u0D7A')
+    .replace(/\u0D30\u0D4D\u200D/g,'\u0D7C').replace(/\u0D32\u0D4D\u200D/g,'\u0D7D')
+    .replace(/\u0D33\u0D4D\u200D/g,'\u0D7E').replace(/\u0D15\u0D4D\u200D/g,'\u0D7F')
+    .replace(/[\u200C\u200D]/g,'').replace(/\s+/g,' ').trim();
+}
+const isCleanML = s => ML.test(s) && /^[\u0D00-\u0D7F \-]+$/.test(s);
+
+const RULES = `You write people's names in Malayalam script, the way a careful native Malayalam speaker from Kerala would write them on a wedding invitation or in a newspaper.
+
+How to do it:
+- Write the name by its SOUND. Never translate its meaning (Rose → റോസ്, never പനിനീർപ്പൂവ്; Hope → ഹോപ്, never പ്രതീക്ഷ).
+- First work out how the name is actually pronounced in its language of origin (Malayalam, Tamil, Hindi, Arabic, Biblical, English, Irish, Spanish, Chinese, Vietnamese, etc.), then spell that pronunciation. Unusual English spellings of foreign names (Siobhan, Nguyen, Xiaoming) follow the real pronunciation, not the letters.
+- Where Kerala already has an established spelling, use it: Muhammad → മുഹമ്മദ്, Thomas → തോമസ്, Joseph → ജോസഫ്, Mary → മേരി, Lakshmi → ലക്ഷ്മി, Fathima → ഫാത്തിമ, Sebastian → സെബാസ്റ്റ്യൻ, John → ജോൺ, Matthew → മാത്യു.
+- Word-final ന ണ ര ല ള with no vowel are written as atomic chillu letters ൻ ൺ ർ ൽ ൾ. Never use ZWJ or ZWNJ.
+- Other word-final consonants end in ് as in modern Malayalam (ജോസഫ്, ഡേവിഡ്, ക്രിസ്).
+- English t usually becomes റ്റ or ട്ട (Peter → പീറ്റർ), d → ഡ, f → ഫ, z → സ, w → വ, final r → ർ.
+- Match vowel length to the real pronunciation (Leah, said LEE-uh → ലിയ; Zoe → സോയി; Neil → നീൽ).
+- Keep each word of a multi-word name, in order, separated by spaces.
+- The "malayalam" fields contain Malayalam script and spaces only: no Latin letters, digits or punctuation.`;
+
+function singlePrompt(name, hint){
+  return `${RULES}
+
+Reply with only one JSON object, no other text:
+{"malayalam": string, "readback": string, "iso": string, "origin": string, "confidence": "high"|"medium"|"low", "note": string, "alternatives": [{"malayalam": string, "readback": string, "when": string}]}
+- readback: how your Malayalam spelling reads aloud, in simple English letters, e.g. "lee-ya".
+- iso: ISO 15919 romanization of your Malayalam spelling.
+- origin: likely language or tradition of the name, a few words.
+- note: one short sentence about any choice a Malayali reader might question, or "".
+- alternatives: 0 to 2 other spellings Malayalis really use for this name, each with a few words on when to prefer it. Empty if there is one clear spelling.
+
+Name: ${name}${hint ? `\nHow the person says it: ${hint}` : ''}`;
+}
+function batchPrompt(names){
+  return `${RULES}
+
+Reply with only a JSON array with one object per name, in the same order, no other text:
+[{"input": string, "malayalam": string, "readback": string, "confidence": "high"|"medium"|"low", "note": string}]
+- readback: how your Malayalam spelling reads aloud, in simple English letters.
+- note: one short sentence about any choice a Malayali reader might question, or "".
+
+Names:
+${names.map((n,i)=>`${i+1}. ${n}`).join('\n')}`;
+}
+
+const ERR = {
+  not_granted:"Claude isn't allowed to run on this page, so names can't be converted here. Typing a name directly in Malayalam still works.",
+  sampling_disabled:"Claude isn't available on this account, so names can't be converted here. Typing a name directly in Malayalam still works.",
+  rate_limited:"Too many requests just now. Wait a minute, then try again.",
+  session_expired:"Your Claude session expired. Sign in again, then retry.",
+  refused:"Claude didn't write that one. Try a different name.",
+  invalid_json:"The answer came back in the wrong shape. Try again.",
+  empty_completion:"No answer came back. Try again.",
+};
+const errText = e => ERR[e && e.code] || "Couldn't reach Claude. Check your connection and try again.";
+function setStatus(t, isErr){ statusEl.textContent=t||''; statusEl.classList.toggle('err', !!isErr); }
+
+async function showWord(ml){
+  await (document.fonts && document.fonts.ready);
+  const words = ml.split(' ');
+  const next = document.createElement('span');
+  next.className='glyphs entering'; next.lang='ml';
+  words.forEach(w=>{ const l=document.createElement('span'); l.className='line'; l.textContent=w; next.append(l); });
+  wordEl.querySelectorAll('.glyphs:not(.leaving)').forEach(old=>{
+    old.classList.remove('entering'); old.classList.add('leaving');
+    const kill=()=>old.remove(); old.addEventListener('animationend',kill,{once:true}); setTimeout(kill,1400);
+  });
+  wordEl.append(next);
+  fit(next);
+  Pane.setWord(next);
+}
+function fit(el){
+  const max = Math.min(wordEl.clientWidth*0.26, 190);
+  let size = max; el.style.fontSize = size+'px';
+  const avail = wordEl.clientWidth*0.94;
+  for(let i=0;i<16 && el.scrollWidth>avail;i++){ size*=0.9; el.style.fontSize=size+'px'; }
+}
+let resizeT; addEventListener('resize',()=>{ clearTimeout(resizeT); resizeT=setTimeout(()=>{ const gl=wordEl.querySelector('.glyphs:not(.leaving)'); if(gl){ fit(gl); Pane.refresh(); } },120); });
+
+function render(r, key){
+  showWord(r.malayalam);
+  setRain(r.malayalam);
+  readEl.innerHTML='';
+  if(r.readback){ readEl.append('Reads as '); const s=document.createElement('strong'); s.textContent=r.readback; readEl.append(s);
+    if(r.iso) readEl.append(` (${r.iso})`); readEl.append('.'); }
+  const bits=[];
+  if(r.origin) bits.push(`Likely origin: ${r.origin}.`);
+  if(r.confidence && r.confidence!=='high') bits.push(`Confidence: ${r.confidence}.`);
+  if(r.note) bits.push(r.note);
+  if(r.yours) bits.push('This is the spelling you picked.');
+  noteEl.textContent=bits.join(' ');
+  altsEl.innerHTML='';
+  const alts=(r.alternatives||[]).filter(a=>a && isCleanML(a.malayalam) && a.malayalam!==r.malayalam);
+  altsEl.hidden=!alts.length;
+  alts.forEach(a=>{
+    const b=document.createElement('button'); b.type='button'; b.className='alt';
+    b.setAttribute('aria-label',`Use ${a.malayalam}, reads as ${a.readback}`);
+    const m=document.createElement('span'); m.className='ml'; m.lang='ml'; m.textContent=a.malayalam;
+    const w=document.createElement('span'); w.className='why'; w.textContent=a.when||a.readback||'';
+    b.append(m,w);
+    b.onclick=()=>{
+      const swapped={...r, malayalam:a.malayalam, readback:a.readback, iso:'', note:'', yours:true,
+        alternatives:[{malayalam:r.malayalam, readback:r.readback, when:'first suggestion'}, ...alts.filter(x=>x!==a)]};
+      if(key){ chosen[key]={...swapped}; store.set(CHOSEN_KEY, chosen); }
+      render(swapped, key);
+    };
+    altsEl.append(b);
+  });
+}
+
+let ctl;
+$('ask').addEventListener('submit', async ev=>{
+  ev.preventDefault();
+  const name=$('name').value.trim().replace(/\s+/g,' ');
+  const hint=$('hint').value.trim();
+  if(!name) return;
+  if(ML.test(name)){ render({malayalam:normalizeML(name), readback:'', note:'Shown as you typed it.'}); setStatus(''); return; }
+  const key=(name+'|'+hint).toLowerCase();
+  if(chosen[key]){ render(chosen[key], key); setStatus(''); return; }
+  const offline=offlineName(name);
+  if(offline.listed && !hint){ render({malayalam:offline.ml, readback:'', note:''}, key); setStatus(''); return; }
+  const sample=await quickSample();
+  if(sample){
+    ctl?.abort(); ctl=new AbortController();
+    goBtn.disabled=true; setStatus('Writing it in Malayalam…');
+    try{
+      const r=await sample.json(singlePrompt(name,hint), {signal:ctl.signal, modelTier:'default'});
+      if(!r || typeof r!=='object') throw {code:'invalid_json'};
+      r.malayalam=normalizeML(r.malayalam);
+      if(!isCleanML(r.malayalam)) throw {code:'invalid_json'};
+      (r.alternatives||[]).forEach(a=>{ if(a) a.malayalam=normalizeML(a.malayalam); });
+      render(r, key); setStatus(''); goBtn.disabled=false; return;
+    }catch(e){
+      goBtn.disabled=false;
+      if(e && e.code==='cancelled') return;
+      if(e && ['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed','session_expired'].includes(e.code)) noClaude();
+    }
+  }
+  if(!offline.ml || !isCleanML(offline.ml)){ setStatus('Type the name using English or Malayalam letters.', true); return; }
+  render({malayalam:offline.ml, readback:'', note:"Best guess from the spelling. If it isn't right, type the name in Malayalam."}, key);
+  setStatus('');
+});
+
+$('checkAll').addEventListener('click', async ()=>{
+  const names=$('list').value.split(/[,\n]/).map(s=>s.trim()).filter(Boolean).slice(0,40);
+  if(!names.length) return;
+  const sample=await samplePromise;
+  const btn=$('checkAll'), table=$('results'), body=table.querySelector('tbody');
+  if(!sample){ setStatus("Checking names needs Claude, which isn't available in this view.", true); return; }
+  btn.disabled=true; btn.textContent='Checking…';
+  try{
+    const rows=await sample.json(batchPrompt(names), {modelTier:$('tier').value});
+    if(!Array.isArray(rows)) throw {code:'invalid_json'};
+    body.innerHTML='';
+    rows.forEach((r,i)=>{
+      if(!r) return;
+      const ml=normalizeML(r.malayalam), ok=isCleanML(ml);
+      const tr=document.createElement('tr'); tr.className='pick'; tr.tabIndex=0;
+      const c=(t,cls)=>{ const td=document.createElement('td'); if(cls) td.className=cls; td.textContent=t; tr.append(td); return td; };
+      const nameTd=c(r.input||names[i]||'');
+      if(r.note){ const s=document.createElement('span'); s.className='sub'; s.textContent=r.note; nameTd.append(s); }
+      const mlTd=c(ok?ml:'(not Malayalam script)','ml'); mlTd.lang='ml';
+      c(r.readback||'');
+      c(r.confidence||'', r.confidence==='high'?'':'low');
+      const show=()=>{ if(ok){ render({malayalam:ml, readback:r.readback, note:r.note}); window.scrollTo({top:0, behavior:'smooth'}); } };
+      tr.onclick=show; tr.onkeydown=e=>{ if(e.key==='Enter') show(); };
+      body.append(tr);
+    });
+    table.hidden=false; setStatus('');
+  }catch(e){ setStatus(errText(e), true); }
+  finally{ btn.disabled=false; btn.textContent='Check all'; }
+});
+
+render({malayalam:'മഴ', readback:'mazha', note:'Rain. Type a name below to see it written in Malayalam.'});
+})();
+</script>
+</body>
+</html>
