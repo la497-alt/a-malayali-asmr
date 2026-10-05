@@ -970,7 +970,7 @@ const NAME_LIST = (()=>{
   'appa':'അപ്പ','chechi':'ചേച്ചി','chettan':'ചേട്ടൻ','ikka':'ഇക്ക','itha|itta':'ഇത്ത','umma':'ഉമ്മ','uppa':'ഉപ്പ','muthassi':'മുത്തശ്ശി','muthassan':'മുത്തശ്ശൻ',
   'valiyammachi|valyammachi':'വല്യമ്മച്ചി','appachan':'അപ്പച്ചൻ','mazha':'മഴ',
   // corrections people sent in
-  'lenin':'ലെനിൻ','hi|hii|hai':'ഹായ്','supraja':'സുപ്രജ','shubha|subha':'ശുഭ','dishant|dishanth':'ദിശാന്ത്'
+  'lenin':'ലെനിൻ','hi|hii|hai':'ഹായ്','supraja':'സുപ്രജ','shubha|subha':'ശുഭ','dishant|dishanth':'ദിശാന്ത്','dum':'ദം'
   };
   const map={};
   for(const [k,v] of Object.entries(raw)) k.split('|').forEach(x=>map[x]=v);
@@ -1025,16 +1025,27 @@ const ML_RULES=(()=>{
 /* Google's Malayalam transliteration (the service behind Google's Malayalam typing).
    Unofficial, so it is only a helper: if it is slow, blocked or odd, the spelling rules take over.
    Its answer is only ever used as text, never run as code. */
+function googleScript(url){
+  return new Promise((ok,fail)=>{
+    const cb='__mlName'+Math.random().toString(36).slice(2), tag=document.createElement('script');
+    const done=()=>{ delete window[cb]; tag.remove(); clearTimeout(t); };
+    const t=setTimeout(()=>{ done(); fail(new Error('timeout')); },3000);
+    window[cb]=data=>{ done(); ok(data); };
+    tag.onerror=()=>{ done(); fail(new Error('blocked')); };
+    tag.src=url+'&cb='+cb; document.head.append(tag);
+  });
+}
 async function googleName(name){
-  const ctrl=new AbortController(), timer=setTimeout(()=>ctrl.abort(),3000);
+  const ctrl=new AbortController(), timer=setTimeout(()=>ctrl.abort(),2500);
   try{
     const words=name.toLowerCase().split(/\s+/).map(w=>w.replace(/[^a-z]/g,'')).filter(Boolean);
     if(!words.length) return null;
     const parts=await Promise.all(words.map(async w=>{
       if(NAME_LIST[w]) return NAME_LIST[w];
-      const url='https://inputtools.google.com/request?itc=ml-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demo&text='+encodeURIComponent(w);
-      const res=await fetch(url,{signal:ctrl.signal});
-      const data=await res.json();
+      const url='https://inputtools.google.com/request?itc=ml-t-i0-und&num=1&cp=0&cs=1&ie=utf-8&oe=utf-8&app=jsapi&text='+encodeURIComponent(w);
+      let data;
+      try{ data=await (await fetch(url,{signal:ctrl.signal})).json(); }
+      catch(e){ if(ctrl.signal.aborted) throw e; data=await googleScript(url); }   // browsers often block the direct request; Google's own typing tools load it as a script instead
       const best=data && data[0]==='SUCCESS' && data[1] && data[1][0] && data[1][0][1] && data[1][0][1][0];
       if(typeof best!=='string') throw new Error('no answer');
       return best;
@@ -1198,7 +1209,7 @@ $('ask').addEventListener('submit', async ev=>{
   goBtn.disabled=true; setStatus('Writing it in Malayalam…');
   const g=await googleName(name);
   goBtn.disabled=false;
-  if(g){ render({malayalam:g, readback:'', note:"If it isn't quite right, type the name in Malayalam."}, key); setStatus(''); return; }
+  if(g){ render({malayalam:g, readback:'', note:"Spelled with Google's help. If it isn't quite right, type the name in Malayalam."}, key); setStatus(''); return; }
   if(!offline.ml || !isCleanML(offline.ml)){ setStatus('Type the name using English or Malayalam letters.', true); return; }
   render({malayalam:offline.ml, readback:'', note:"Best guess from the spelling. If it isn't right, type the name in Malayalam."}, key);
   setStatus('');
